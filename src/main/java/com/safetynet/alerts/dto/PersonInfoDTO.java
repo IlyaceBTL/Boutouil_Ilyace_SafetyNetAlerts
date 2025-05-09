@@ -94,7 +94,7 @@ public class PersonInfoDTO {
     }
 
     public Integer calculateAge(String birthDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         LocalDate birth = LocalDate.parse(birthDate, formatter);
         LocalDate now = LocalDate.now();
         return Period.between(birth, now).getYears();
