@@ -1,9 +1,11 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.dto.ChildAlertDTO;
 import com.safetynet.alerts.dto.PersonInfoDTO;
 import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.PersonRepository;
+import com.safetynet.alerts.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +25,9 @@ public class PersonService {
     }
 
     public List<PersonInfoDTO> getPersonInfoLastName(String lastName) {
-
         List<PersonInfoDTO> personInfoDTOList = new ArrayList<>();
         List<Person> persons = personRepository.getAllperson();
+
         for (Person person : persons) {
             if (person.getLastName().equals(lastName)) {
                 MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
@@ -34,5 +36,28 @@ public class PersonService {
             }
         }
         return (personInfoDTOList);
+    }
+
+    public List<ChildAlertDTO> getChildByAddress(String address) {
+        List<ChildAlertDTO> childAlertDTOList = new ArrayList<>();
+        List<Person> persons = personRepository.getAllperson();
+
+        for (Person person : persons) {
+            if (person.getAddress().equals(address)) {
+                MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                Integer age = DateUtils.calculateAge(medicalRecords.getBirthdate());
+                if (age <= 18) {
+                    List<Person> personSameAddress = new ArrayList<>();
+                    for (Person person1 : persons) {
+                        if (person1.getAddress().equals(person.getAddress())) {
+                            personSameAddress.add(person1);
+                        }
+                    }
+                    ChildAlertDTO childAlertDTO = new ChildAlertDTO(person, medicalRecords, personSameAddress);
+                    childAlertDTOList.add(childAlertDTO);
+                }
+            }
+        }
+        return childAlertDTOList;
     }
 }

@@ -2,10 +2,8 @@ package com.safetynet.alerts.dto;
 
 import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
+import com.safetynet.alerts.utils.DateUtils;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class PersonInfoDTO {
@@ -32,7 +30,7 @@ public class PersonInfoDTO {
         this.lastName = person.getLastName();
         this.address = person.getAddress();
         this.email = person.getEmail();
-        this.age = calculateAge(medicalRecords.getBirthdate());
+        this.age = DateUtils.calculateAge(medicalRecords.getBirthdate());
         this.medications = medicalRecords.getMedications();
         this.allergies = medicalRecords.getAllergies();
     }
@@ -93,10 +91,4 @@ public class PersonInfoDTO {
         this.medications = medications;
     }
 
-    public Integer calculateAge(String birthDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        LocalDate birth = LocalDate.parse(birthDate, formatter);
-        LocalDate now = LocalDate.now();
-        return Period.between(birth, now).getYears();
-    }
 }
