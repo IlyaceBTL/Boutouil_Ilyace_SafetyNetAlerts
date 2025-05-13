@@ -1,5 +1,6 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.dto.FireDTO;
 import com.safetynet.alerts.dto.FireStationDTO;
 import com.safetynet.alerts.dto.FireStationResponseDTO;
 import com.safetynet.alerts.dto.PhoneAlertDTO;
@@ -67,5 +68,21 @@ public class FireStationService {
             }
         }
         return personByFireStation;
+    }
+
+    public List<FireDTO> getPersonByAddress(String address) {
+        List<FireDTO> fireDTOList = new ArrayList<>();
+        List<Person> personList = personRepository.getAllperson();
+        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
+        for (Person person : personList) {
+            for (FireStation fireStation : fireStationList) {
+                if (fireStation.getAddress().equals(address) && person.getAddress().equals(address)) {
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    FireDTO fireDTO = new FireDTO(person, fireStation, medicalRecords);
+                    fireDTOList.add(fireDTO);
+                }
+            }
+        }
+        return fireDTOList;
     }
 }

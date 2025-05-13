@@ -1,5 +1,6 @@
 package com.safetynet.alerts.controller;
 
+import com.safetynet.alerts.dto.FireDTO;
 import com.safetynet.alerts.dto.FireStationResponseDTO;
 import com.safetynet.alerts.dto.PhoneAlertDTO;
 import com.safetynet.alerts.service.FireStationService;
@@ -28,5 +29,10 @@ public class FireStationController {
     @GetMapping("/phoneAlert")
     public List<PhoneAlertDTO> getPhoneByFireStation(@RequestParam String firestation_number) {
         return fireStationService.getPhoneNumberByFireStation(firestation_number);
+    }
+
+    @GetMapping("/fire")
+    public List<FireDTO> getPersonByAddress(@RequestParam String address) {
+        return fireStationService.getPersonByAddress(address);
     }
 }
