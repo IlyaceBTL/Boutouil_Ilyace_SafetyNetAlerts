@@ -1,6 +1,7 @@
 package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.dto.ChildAlertDTO;
+import com.safetynet.alerts.dto.CommunityEmailDTO;
 import com.safetynet.alerts.dto.PersonInfoDTO;
 import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
@@ -60,4 +61,18 @@ public class PersonService {
         }
         return childAlertDTOList;
     }
+
+    public List<CommunityEmailDTO> getEmailByCity(String city) {
+        List<CommunityEmailDTO> communityEmailDTOList = new ArrayList<>();
+        List<Person> persons = personRepository.getAllperson();
+
+        for (Person person : persons) {
+            if (person.getCity().equals(city)) {
+                CommunityEmailDTO communityEmailDTO = new CommunityEmailDTO(person);
+                communityEmailDTOList.add(communityEmailDTO);
+            }
+        }
+        return communityEmailDTOList;
+    }
+
 }
