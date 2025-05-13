@@ -2,6 +2,7 @@ package com.safetynet.alerts.controller;
 
 import com.safetynet.alerts.dto.FireDTO;
 import com.safetynet.alerts.dto.FireStationResponseDTO;
+import com.safetynet.alerts.dto.FloodStationsDTO;
 import com.safetynet.alerts.dto.PhoneAlertDTO;
 import com.safetynet.alerts.service.FireStationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,4 +36,10 @@ public class FireStationController {
     public List<FireDTO> getPersonByAddress(@RequestParam String address) {
         return fireStationService.getPersonByAddress(address);
     }
+
+    @GetMapping("/flood/stations")
+    public List<FloodStationsDTO> getPersonByListOfStations(@RequestParam List<String> stations) {
+        return fireStationService.getPersonByListOfStations(stations);
+    }
+
 }
