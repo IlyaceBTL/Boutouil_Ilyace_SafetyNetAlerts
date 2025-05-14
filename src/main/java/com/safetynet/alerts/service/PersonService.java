@@ -27,7 +27,7 @@ public class PersonService {
 
     public List<PersonInfoDTO> getPersonInfoLastName(String lastName) {
         List<PersonInfoDTO> personInfoDTOList = new ArrayList<>();
-        List<Person> persons = personRepository.getAllperson();
+        List<Person> persons = personRepository.getAllPersons();
 
         for (Person person : persons) {
             if (person.getLastName().equals(lastName)) {
@@ -41,7 +41,7 @@ public class PersonService {
 
     public List<ChildAlertDTO> getChildByAddress(String address) {
         List<ChildAlertDTO> childAlertDTOList = new ArrayList<>();
-        List<Person> persons = personRepository.getAllperson();
+        List<Person> persons = personRepository.getAllPersons();
 
         for (Person person : persons) {
             if (person.getAddress().equals(address)) {
@@ -64,7 +64,7 @@ public class PersonService {
 
     public List<CommunityEmailDTO> getEmailByCity(String city) {
         List<CommunityEmailDTO> communityEmailDTOList = new ArrayList<>();
-        List<Person> persons = personRepository.getAllperson();
+        List<Person> persons = personRepository.getAllPersons();
 
         for (Person person : persons) {
             if (person.getCity().equals(city)) {

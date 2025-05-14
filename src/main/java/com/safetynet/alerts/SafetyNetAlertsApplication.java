@@ -22,7 +22,7 @@ public class SafetyNetAlertsApplication {
         FireStationRepository fireStationRepository = new FireStationRepository();
         MedicalRecordsRepository medicalRecordsRepository = new MedicalRecordsRepository();
 
-        List<Person> persons = personRepository.getAllperson();
+        List<Person> persons = personRepository.getAllPersons();
         for (Person person : persons) {
             logger.info(person.toString());
         }

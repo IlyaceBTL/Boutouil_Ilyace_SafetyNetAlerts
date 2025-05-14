@@ -28,7 +28,7 @@ public class FireStationService {
 
     public FireStationResponseDTO getPersonByStationNumber(String stationNumber) {
         List<FireStationDTO> fireStationDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllperson();
+        List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
         for (Person person : personList) {
             for (FireStation fireStation : fireStationList) {
@@ -54,7 +54,7 @@ public class FireStationService {
 
     public List<PhoneAlertDTO> getPhoneNumberByFireStation(String fireStationNumber) {
         List<PhoneAlertDTO> personByFireStation = new ArrayList<>();
-        List<Person> personList = personRepository.getAllperson();
+        List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
         for (Person person : personList) {
             for (FireStation fireStation : fireStationList) {
@@ -69,7 +69,7 @@ public class FireStationService {
 
     public List<FireDTO> getPersonByAddress(String address) {
         List<FireDTO> fireDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllperson();
+        List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
         for (Person person : personList) {
             for (FireStation fireStation : fireStationList) {
@@ -85,7 +85,7 @@ public class FireStationService {
 
     public List<FloodStationsDTO> getPersonByListOfStations(List<String> fireStations) {
         List<FloodStationsDTO> floodStationsDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllperson();
+        List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
         for (Person person : personList) {
             for (FireStation fireStation : fireStationList) {
