@@ -16,7 +16,7 @@ public class FireStationRepository {
         return new ArrayList<>(fireStationList);
     }
 
-    public void addFireStationRepository(FireStation fireStation) {
+    public void addFireStation(FireStation fireStation) {
         fireStationList.add(fireStation);
     }
 }

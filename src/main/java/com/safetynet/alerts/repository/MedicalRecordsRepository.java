@@ -16,7 +16,7 @@ public class MedicalRecordsRepository {
         return new ArrayList<>(medicalRecordsList);
     }
 
-    public void addMedicalRecordsRepository(MedicalRecords medicalRecords) {
+    public void addMedicalRecords(MedicalRecords medicalRecords) {
         medicalRecordsList.add(medicalRecords);
     }
 }

@@ -59,7 +59,7 @@ public class JSONReaderService {
             Person[] personsArray = objectMapper.treeToValue(personsNode, Person[].class);
             personList = Arrays.asList(personsArray);
             for (Person person : personList) {
-                personRepository.addPersonRepository(person);
+                personRepository.addPerson(person);
 
             }
             logger.info(personList.size() + " Person load from data.json");
@@ -77,7 +77,7 @@ public class JSONReaderService {
             FireStation[] fireStationTableau = objectMapper.treeToValue(fireStationNode, FireStation[].class);
             fireStationList = Arrays.asList(fireStationTableau);
             for (FireStation fireStation : fireStationList) {
-                fireStationRepository.addFireStationRepository(fireStation);
+                fireStationRepository.addFireStation(fireStation);
             }
             logger.info(fireStationList.size() + " FireStation load from data.json");
         } catch (JsonProcessingException e) {
@@ -93,7 +93,7 @@ public class JSONReaderService {
             MedicalRecords[] medicalRecordsTableau = objectMapper.treeToValue(medicalRecordsNode, MedicalRecords[].class);
             medicalRecordsList = Arrays.asList(medicalRecordsTableau);
             for (MedicalRecords medicalRecords : medicalRecordsList) {
-                medicalRecordsRepository.addMedicalRecordsRepository(medicalRecords);
+                medicalRecordsRepository.addMedicalRecords(medicalRecords);
             }
             logger.info(medicalRecordsList.size() + " MedicalRecords loaded from data.json");
         } catch (JsonProcessingException e) {

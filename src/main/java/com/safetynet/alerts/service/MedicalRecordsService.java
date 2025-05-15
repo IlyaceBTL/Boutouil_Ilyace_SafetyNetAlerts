@@ -17,6 +17,16 @@ public class MedicalRecordsService {
         this.medicalRecordsRepository = medicalRecordsRepository;
     }
 
+    public void createMedicalsRecords(String firstName, String lastName, String birthdate, List<String> medications, List<String>allergies){
+        MedicalRecords medicalRecords = new MedicalRecords();
+        medicalRecords.setFirstName(firstName);
+        medicalRecords.setLastName(lastName);
+        medicalRecords.setBirthdate(birthdate);
+        medicalRecords.setMedications(medications);
+        medicalRecords.setAllergies(allergies);
+        medicalRecordsRepository.addMedicalRecords(medicalRecords);
+    }
+
     public MedicalRecords getMedicalRecordsByName(String firstName, String lastName) {
         List<MedicalRecords> medicalRecordsList = medicalRecordsRepository.getAllMedicalRecords();
         for (MedicalRecords medicalRecords : medicalRecordsList) {

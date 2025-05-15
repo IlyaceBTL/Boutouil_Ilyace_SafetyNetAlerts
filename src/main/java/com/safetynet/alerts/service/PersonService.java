@@ -25,6 +25,23 @@ public class PersonService {
         this.medicalRecordsService = medicalRecordsService;
     }
 
+    public Person createPerson(Person person) {
+        personRepository.addPerson(person);
+        return person;
+    }
+
+    public Person getPerson(String firstName, String lastName) {
+        return personRepository.getPerson(firstName, lastName);
+    }
+
+    public Person updatePerson(Person person) {
+        return personRepository.updatePerson(person);
+    }
+
+    public void deletePerson(String firstName, String lastName) {
+        personRepository.deletePerson(firstName, lastName);
+    }
+
     public List<PersonInfoDTO> getPersonInfoLastName(String lastName) {
         List<PersonInfoDTO> personInfoDTOList = new ArrayList<>();
         List<Person> persons = personRepository.getAllPersons();

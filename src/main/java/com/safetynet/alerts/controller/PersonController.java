@@ -1,15 +1,12 @@
 package com.safetynet.alerts.controller;
 
-import com.safetynet.alerts.dto.ChildAlertDTO;
-import com.safetynet.alerts.dto.CommunityEmailDTO;
-import com.safetynet.alerts.dto.PersonInfoDTO;
+import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 public class PersonController {
@@ -21,18 +18,27 @@ public class PersonController {
         this.personService = personService;
     }
 
-    @GetMapping("/personInfolastName")
-    public List<PersonInfoDTO> getPersonInfo(@RequestParam String lastName) {
-        return personService.getPersonInfoLastName(lastName);
+    @PostMapping("/person")
+    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
+        Person createdPerson = personService.createPerson(person);
+        return new ResponseEntity<>(createdPerson, HttpStatus.CREATED);
     }
 
-    @GetMapping("/childAlert")
-    public List<ChildAlertDTO> getChildAlertByAddress(@RequestParam String address) {
-        return personService.getChildByAddress(address);
+    @GetMapping("/person")
+    public ResponseEntity<Person> getPerson(@RequestParam String firstName, @RequestParam String lastName) {
+        Person person = personService.getPerson(firstName, lastName);
+        return new ResponseEntity<>(person, HttpStatus.OK);
     }
 
-    @GetMapping("/communityEmail")
-    public List<CommunityEmailDTO> getEmailByCity(@RequestParam String city) {
-        return personService.getEmailByCity(city);
+    @PutMapping("/person")
+    public ResponseEntity<Person> updatePerson(@RequestBody Person person) {
+        Person updatedPerson = personService.updatePerson(person);
+        return new ResponseEntity<>(updatedPerson,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/person")
+    public ResponseEntity<Void> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
+        personService.deletePerson(firstName, lastName);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

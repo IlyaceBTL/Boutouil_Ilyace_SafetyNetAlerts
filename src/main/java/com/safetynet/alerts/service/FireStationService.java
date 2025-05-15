@@ -26,6 +26,13 @@ public class FireStationService {
         this.medicalRecordsService = medicalRecordsService;
     }
 
+    public void createFireStation(String address, String station){
+        FireStation fireStation = new FireStation();
+        fireStation.setAddress(address);
+        fireStation.setStation(station);
+        fireStationRepository.addFireStation(fireStation);
+    }
+
     public FireStationResponseDTO getPersonByStationNumber(String stationNumber) {
         List<FireStationDTO> fireStationDTOList = new ArrayList<>();
         List<Person> personList = personRepository.getAllPersons();
