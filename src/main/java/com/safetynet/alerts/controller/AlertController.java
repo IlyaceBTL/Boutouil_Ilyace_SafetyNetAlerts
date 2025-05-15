@@ -17,7 +17,7 @@ public class AlertController {
     private final PersonService personService;
 
     @Autowired
-    public AlertController(PersonService personService,FireStationService fireStationService) {
+    public AlertController(PersonService personService, FireStationService fireStationService) {
         this.personService = personService;
         this.fireStationService = fireStationService;
     }
@@ -35,11 +35,6 @@ public class AlertController {
     @GetMapping("/communityEmail")
     public List<CommunityEmailDTO> getEmailByCity(@RequestParam String city) {
         return personService.getEmailByCity(city);
-    }
-
-    @GetMapping("/firestation")
-    public FireStationResponseDTO getPersonByStationNumber(@RequestParam String station_number) {
-        return fireStationService.getPersonByStationNumber(station_number);
     }
 
     @GetMapping("/phoneAlert")

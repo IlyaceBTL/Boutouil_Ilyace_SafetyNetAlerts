@@ -26,11 +26,21 @@ public class FireStationService {
         this.medicalRecordsService = medicalRecordsService;
     }
 
-    public void createFireStation(String address, String station){
-        FireStation fireStation = new FireStation();
-        fireStation.setAddress(address);
-        fireStation.setStation(station);
+    public FireStation createFireStation(FireStation fireStation) {
         fireStationRepository.addFireStation(fireStation);
+        return fireStation;
+    }
+
+    public FireStation getFireStation(String address) {
+        return fireStationRepository.getFireStation(address);
+    }
+
+    public FireStation updateFireStation(FireStation fireStation) {
+        return fireStationRepository.updateFireStation(fireStation);
+    }
+
+    public void deleteFireStation(String address) {
+        fireStationRepository.deleteFireStation(address);
     }
 
     public FireStationResponseDTO getPersonByStationNumber(String stationNumber) {
