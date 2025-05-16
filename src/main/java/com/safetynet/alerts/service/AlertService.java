@@ -2,7 +2,6 @@ package com.safetynet.alerts.service;
 
 import com.safetynet.alerts.dto.*;
 import com.safetynet.alerts.model.FireStation;
-import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.PersonRepository;
@@ -27,6 +26,7 @@ public class AlertService {
         this.medicalRecordsService = medicalRecordsService;
     }
 
+    //TODO reworking on all methode to use .stream instead of loops for
     public List<ChildAlertDTO> getChildByAddress(String address) {
         List<ChildAlertDTO> childAlertDTOList = new ArrayList<>();
         List<Person> persons = personRepository.getAllPersons();

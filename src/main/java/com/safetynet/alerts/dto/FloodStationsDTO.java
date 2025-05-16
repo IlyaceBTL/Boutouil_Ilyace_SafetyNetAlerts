@@ -1,6 +1,5 @@
 package com.safetynet.alerts.dto;
 
-import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.utils.DateUtils;
 

@@ -19,4 +19,32 @@ public class MedicalRecordsRepository {
     public void addMedicalRecords(MedicalRecords medicalRecords) {
         medicalRecordsList.add(medicalRecords);
     }
+
+    public MedicalRecords getMedicalRecords(String firstName, String lastName) {
+        return medicalRecordsList.stream()
+                .filter(medicalRecordsLooking -> medicalRecordsLooking.getFirstName().equalsIgnoreCase(firstName) && medicalRecordsLooking.getLastName().equalsIgnoreCase(lastName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public MedicalRecords updateMedicalRecords(MedicalRecords medicalRecords) {
+        return medicalRecordsList.stream()
+                .filter(medicalRecordsLooking -> medicalRecordsLooking.getFirstName().equalsIgnoreCase(medicalRecords.getFirstName()) && medicalRecordsLooking.getLastName().equalsIgnoreCase(medicalRecords.getLastName()))
+                .findFirst()
+                .map(medicalRecordsUpdate -> {
+                    medicalRecordsUpdate.setBirthdate(medicalRecords.getBirthdate());
+                    medicalRecordsUpdate.setMedications(medicalRecords.getMedications());
+                    medicalRecordsUpdate.setAllergies(medicalRecords.getAllergies());
+
+                    return medicalRecordsUpdate;
+                })
+                .orElse(null);
+    }
+
+    public void deleteMedicalRecords(String firstName, String lastName) {
+        medicalRecordsList.stream()
+                .filter(personLooking -> personLooking.getFirstName().equalsIgnoreCase(firstName) && personLooking.getLastName().equalsIgnoreCase(lastName))
+                .findFirst()
+                .ifPresent(medicalRecordsList::remove);
+    }
 }

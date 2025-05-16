@@ -5,8 +5,6 @@ import com.safetynet.alerts.repository.MedicalRecordsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class MedicalRecordsService {
 
@@ -17,23 +15,21 @@ public class MedicalRecordsService {
         this.medicalRecordsRepository = medicalRecordsRepository;
     }
 
-    public void createMedicalsRecords(String firstName, String lastName, String birthdate, List<String> medications, List<String>allergies){
-        MedicalRecords medicalRecords = new MedicalRecords();
-        medicalRecords.setFirstName(firstName);
-        medicalRecords.setLastName(lastName);
-        medicalRecords.setBirthdate(birthdate);
-        medicalRecords.setMedications(medications);
-        medicalRecords.setAllergies(allergies);
+    public MedicalRecords createMedicalRecords(MedicalRecords medicalRecords) {
         medicalRecordsRepository.addMedicalRecords(medicalRecords);
+        return medicalRecords;
     }
 
     public MedicalRecords getMedicalRecordsByName(String firstName, String lastName) {
-        List<MedicalRecords> medicalRecordsList = medicalRecordsRepository.getAllMedicalRecords();
-        for (MedicalRecords medicalRecords : medicalRecordsList) {
-            if (medicalRecords.getFirstName().equals(firstName) && medicalRecords.getLastName().equals(lastName)) {
-                return (medicalRecords);
-            }
-        }
-        return null;
+        return medicalRecordsRepository.getMedicalRecords(firstName, lastName);
+    }
+
+    public MedicalRecords updtadeMedicalRecords(MedicalRecords medicalRecords) {
+        medicalRecordsRepository.updateMedicalRecords(medicalRecords);
+        return medicalRecords;
+    }
+
+    public void deleteMedicalRecords(String firstName, String lastName) {
+        medicalRecordsRepository.deleteMedicalRecords(firstName, lastName);
     }
 }
