@@ -64,4 +64,8 @@ public class FireStationService {
         }
         return new FireStationResponseDTO(fireStationDTOList, numberOfAdults, numberOfChildren);
     }
+
+    public FireStation getFireStationByAddress(String address) {
+        return fireStationRepository.getFireStationByAddress(address);
+    }
 }

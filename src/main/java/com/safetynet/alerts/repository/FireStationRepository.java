@@ -38,4 +38,11 @@ public class FireStationRepository {
                 .findFirst()
                 .ifPresent(fireStationList::remove);
     }
+
+    public FireStation getFireStationByAddress(String address) {
+        return fireStationList.stream()
+                .filter(fireStationLooking -> fireStationLooking.getAddress().equalsIgnoreCase(address))
+                .findFirst()
+                .orElse(null);
+    }
 }
