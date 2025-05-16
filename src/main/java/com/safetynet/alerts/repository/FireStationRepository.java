@@ -20,13 +20,6 @@ public class FireStationRepository {
         fireStationList.add(fireStation);
     }
 
-    public FireStation getFireStation(String address) {
-        return fireStationList.stream()
-                .filter(fireStationLooking -> fireStationLooking.getAddress().equalsIgnoreCase(address))
-                .findFirst()
-                .orElse(null);
-    }
-
     public FireStation updateFireStation(FireStation fireStation) {
         return fireStationList.stream()
                 .filter(fireStationLooking -> fireStationLooking.getAddress().equalsIgnoreCase(fireStation.getAddress()))

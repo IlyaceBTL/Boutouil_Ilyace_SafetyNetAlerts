@@ -31,10 +31,6 @@ public class FireStationService {
         return fireStation;
     }
 
-    public FireStation getFireStation(String address) {
-        return fireStationRepository.getFireStation(address);
-    }
-
     public FireStation updateFireStation(FireStation fireStation) {
         return fireStationRepository.updateFireStation(fireStation);
     }
@@ -67,52 +63,5 @@ public class FireStationService {
             }
         }
         return new FireStationResponseDTO(fireStationDTOList, numberOfAdults, numberOfChildren);
-    }
-
-    public List<PhoneAlertDTO> getPhoneNumberByFireStation(String fireStationNumber) {
-        List<PhoneAlertDTO> personByFireStation = new ArrayList<>();
-        List<Person> personList = personRepository.getAllPersons();
-        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStation.getStation().equals(fireStationNumber) && fireStation.getAddress().equals(person.getAddress())) {
-                    PhoneAlertDTO phoneAlertDTO = new PhoneAlertDTO(person.getPhone());
-                    personByFireStation.add(phoneAlertDTO);
-                }
-            }
-        }
-        return personByFireStation;
-    }
-
-    public List<FireDTO> getPersonByAddress(String address) {
-        List<FireDTO> fireDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllPersons();
-        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStation.getAddress().equals(address) && person.getAddress().equals(address)) {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                    FireDTO fireDTO = new FireDTO(person, fireStation, medicalRecords);
-                    fireDTOList.add(fireDTO);
-                }
-            }
-        }
-        return fireDTOList;
-    }
-
-    public List<FloodStationsDTO> getPersonByListOfStations(List<String> fireStations) {
-        List<FloodStationsDTO> floodStationsDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllPersons();
-        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStations.contains(fireStation.getStation()) && fireStation.getAddress().equals(person.getAddress())) {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                    FloodStationsDTO floodStationsDTO = new FloodStationsDTO(person, medicalRecords);
-                    floodStationsDTOList.add(floodStationsDTO);
-                }
-            }
-        }
-        return floodStationsDTOList;
     }
 }

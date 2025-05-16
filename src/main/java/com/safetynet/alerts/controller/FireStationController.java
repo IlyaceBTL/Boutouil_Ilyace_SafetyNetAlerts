@@ -30,12 +30,6 @@ public class FireStationController {
         return fireStationService.getPersonByStationNumber(station_number);
     }
 
-//    @GetMapping("/firestation")
-//    public ResponseEntity<FireStation> getPerson(@RequestParam String address) {
-//        FireStation fireStation = fireStationService.getFireStation(address);
-//        return new ResponseEntity<>(fireStation, HttpStatus.OK);
-//    }
-
     @PutMapping("/firestation")
     public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation fireStation) {
         FireStation updatedFireStation = fireStationService.updateFireStation(fireStation);
