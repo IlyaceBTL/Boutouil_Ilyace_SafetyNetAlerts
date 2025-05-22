@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository class for managing Person objects in memory.
@@ -35,6 +36,7 @@ public class PersonRepository {
      * @param lastName  the person's last name
      * @return the matched person, or null if not found
      */
+    //TODO GERER LES OPTIONAL POUR PAS TRAVAILLER SUR DES NULL
     public Person getPerson(String firstName, String lastName) {
         return personList.stream()
                 .filter(personLooking -> personLooking.getFirstName().equalsIgnoreCase(firstName) && personLooking.getLastName().equalsIgnoreCase(lastName))

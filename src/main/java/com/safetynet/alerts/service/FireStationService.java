@@ -20,7 +20,7 @@ public class FireStationService {
     private final MedicalRecordsService medicalRecordsService;
 
     @Autowired
-    private FireStationService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsService medicalRecordsService) {
+    public FireStationService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsService medicalRecordsService) {
         this.personRepository = personRepository;
         this.fireStationRepository = fireStationRepository;
         this.medicalRecordsService = medicalRecordsService;

@@ -35,8 +35,8 @@ public class AlertController {
     }
 
     @GetMapping("/phoneAlert")
-    public List<PhoneAlertDTO> getPhoneByFireStation(@RequestParam String firestation_number) {
-        return alertService.getPhoneNumberByFireStation(firestation_number);
+    public List<PhoneAlertDTO> getPhoneByFireStation(@RequestParam String firestation) {
+        return alertService.getPhoneNumberByFireStation(firestation);
     }
 
     @GetMapping("/fire")

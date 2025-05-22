@@ -30,6 +30,7 @@ public class PersonController {
      * @param person the person to create
      * @return {@code 201 Created} if successful, {@code 409 Conflict} if the person already exists
      */
+    //TODO ESSAYER DE FAIRE FONCTIONNER @OPTIONAL + MODIFIER LES URLS SURTOUT DANS ALERTS
     @PostMapping("/person")
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         if (personService.getPerson(person.getFirstName(), person.getLastName()) != null) {

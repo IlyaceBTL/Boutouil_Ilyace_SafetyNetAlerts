@@ -10,8 +10,11 @@ import com.safetynet.alerts.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 public class AlertService {
@@ -29,99 +32,100 @@ public class AlertService {
 
     //TODO reworking on all methode to use .stream instead of loops for
     public List<ChildAlertDTO> getChildByAddress(String address) {
-        List<ChildAlertDTO> childAlertDTOList = new ArrayList<>();
+
         List<Person> persons = personRepository.getAllPersons();
 
-        for (Person person : persons) {
-            if (person.getAddress().equals(address)) {
-                MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                Integer age = DateUtils.calculateAge(medicalRecords.getBirthdate());
-                if (age <= 18) {
-                    List<Person> personSameAddress = new ArrayList<>();
-                    for (Person person1 : persons) {
-                        if (person1.getAddress().equals(person.getAddress())) {
-                            personSameAddress.add(person1);
-                        }
+        // Filter persons living at those addresses
+        List<Person> personSameAddress = persons.stream()
+                .filter(personLooking -> personLooking.getAddress().equals(address))
+                .toList();
+        // For each person at the address, check if they are a child (age <= 18)
+        // If yes, create a ChildAlertDTO including the list of all people at that address
+        return personSameAddress.stream()
+                .map(person -> {
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    int age = DateUtils.calculateAge(medicalRecords.getBirthdate());
+                    if (age <= 18) {
+                        return new ChildAlertDTO(person, medicalRecords, personSameAddress);
+                    } else {
+                        return null;
                     }
-                    ChildAlertDTO childAlertDTO = new ChildAlertDTO(person, medicalRecords, personSameAddress);
-                    childAlertDTOList.add(childAlertDTO);
-                }
-            }
-        }
-        return childAlertDTOList;
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
     }
 
     public List<PhoneAlertDTO> getPhoneNumberByFireStation(String fireStationNumber) {
-        List<PhoneAlertDTO> personByFireStation = new ArrayList<>();
         List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStation.getStation().equals(fireStationNumber) && fireStation.getAddress().equals(person.getAddress())) {
-                    PhoneAlertDTO phoneAlertDTO = new PhoneAlertDTO(person.getPhone());
-                    personByFireStation.add(phoneAlertDTO);
-                }
-            }
-        }
-        return personByFireStation;
+
+        // Get the addresses covered by the given fire station number
+        Set<String> coveredAddresses = fireStationList.stream()
+                .filter(fireStation -> fireStation.getStation().equals(fireStationNumber))
+                .map(FireStation::getAddress)
+                .collect(Collectors.toSet());
+
+        // Filter persons living at those addresses and return their phone numbers
+        return personList.stream()
+                .filter(person -> coveredAddresses.contains(person.getAddress()))
+                .map(person -> new PhoneAlertDTO(person.getPhone()))
+                .toList();
     }
 
     public List<FireDTO> getPersonByAddress(String address) {
-        List<FireDTO> fireDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllPersons();
-        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStation.getAddress().equals(address) && person.getAddress().equals(address)) {
+        FireStation fireStation = fireStationRepository.getFireStationByAddress(address);
+        // Get all persons living at the given address
+        List<Person> personSameAddress = personRepository.getAllPersons().stream()
+                .filter(person -> person.getAddress().equals(address))
+                .toList();
+        // Map each person to a FireDTO that includes medical information and station number
+        return personSameAddress.stream()
+                .map(person -> {
                     MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                    FireDTO fireDTO = new FireDTO(person, fireStation, medicalRecords);
-                    fireDTOList.add(fireDTO);
-                }
-            }
-        }
-        return fireDTOList;
+                    return new FireDTO(person, fireStation, medicalRecords);
+                })
+                .toList();
+
     }
 
-    public List<FloodStationsDTO> getPersonByListOfStations(List<String> fireStations) {
-        List<FloodStationsDTO> floodStationsDTOList = new ArrayList<>();
-        List<Person> personList = personRepository.getAllPersons();
-        List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (fireStations.contains(fireStation.getStation()) && fireStation.getAddress().equals(person.getAddress())) {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                    FloodStationsDTO floodStationsDTO = new FloodStationsDTO(person, medicalRecords);
-                    floodStationsDTOList.add(floodStationsDTO);
-                }
-            }
-        }
-        return floodStationsDTOList;
+    public List<FloodStationsDTO> getPersonByListOfStations(List<String> fireStationsNumber) {
+        // Get the set of addresses covered by the provided station numbers
+        Set<String> fireStationAddresses = fireStationRepository.getAllFireStation().stream()
+                .filter(fireStation -> fireStationsNumber.contains(fireStation.getStation()))
+                .map(FireStation::getAddress)
+                .collect(Collectors.toSet());
+
+        // Filter persons by those living at one of the fire station addresses
+        // Then map them to FloodStationsDTO with their medical records
+        return personRepository.getAllPersons().stream()
+                .filter(person -> fireStationAddresses.contains(person.getAddress()))
+                .map(person -> {
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(
+                            person.getFirstName(), person.getLastName());
+                    return new FloodStationsDTO(person, medicalRecords);
+                })
+                .toList();
+
     }
 
     public List<PersonInfoDTO> getPersonInfoLastName(String lastName) {
-        List<PersonInfoDTO> personInfoDTOList = new ArrayList<>();
-        List<Person> persons = personRepository.getAllPersons();
-
-        for (Person person : persons) {
-            if (person.getLastName().equals(lastName)) {
-                MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                PersonInfoDTO personInfoDTO = new PersonInfoDTO(person, medicalRecords);
-                personInfoDTOList.add(personInfoDTO);
-            }
-        }
-        return (personInfoDTOList);
+        // Get all persons living at the given address with medicalRecords
+        return personRepository.getAllPersons().stream()
+                .filter(person -> person.getLastName().equals(lastName))
+                .map(person -> {
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    return new PersonInfoDTO(person, medicalRecords);
+                })
+                .toList();
     }
 
     public List<CommunityEmailDTO> getEmailByCity(String city) {
-        List<CommunityEmailDTO> communityEmailDTOList = new ArrayList<>();
-        List<Person> persons = personRepository.getAllPersons();
-
-        for (Person person : persons) {
-            if (person.getCity().equals(city)) {
-                CommunityEmailDTO communityEmailDTO = new CommunityEmailDTO(person);
-                communityEmailDTOList.add(communityEmailDTO);
-            }
-        }
-        return communityEmailDTOList;
+        return personRepository.getAllPersons().stream()
+                .filter(person -> person.getCity().equalsIgnoreCase(city))
+                .map(person -> new CommunityEmailDTO(person.getEmail()))
+                .distinct()
+                .toList();
     }
+
 }
