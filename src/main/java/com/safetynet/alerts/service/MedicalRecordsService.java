@@ -5,6 +5,8 @@ import com.safetynet.alerts.repository.MedicalRecordsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class MedicalRecordsService {
 
@@ -20,7 +22,7 @@ public class MedicalRecordsService {
         return medicalRecords;
     }
 
-    public MedicalRecords getMedicalRecordsByName(String firstName, String lastName) {
+    public Optional<MedicalRecords> getMedicalRecordsByName(String firstName, String lastName) {
         return medicalRecordsRepository.getMedicalRecords(firstName, lastName);
     }
 
@@ -31,5 +33,8 @@ public class MedicalRecordsService {
 
     public void deleteMedicalRecords(String firstName, String lastName) {
         medicalRecordsRepository.deleteMedicalRecords(firstName, lastName);
+    }
+    public MedicalRecords blankMedicalRecords(){
+        return medicalRecordsRepository.blankMedicalRecords();
     }
 }

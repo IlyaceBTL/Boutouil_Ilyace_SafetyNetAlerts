@@ -43,7 +43,8 @@ public class AlertService {
         // If yes, create a ChildAlertDTO including the list of all people at that address
         return personSameAddress.stream()
                 .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElse(medicalRecordsService.blankMedicalRecords());
                     int age = DateUtils.calculateAge(medicalRecords.getBirthdate());
                     if (age <= 18) {
                         return new ChildAlertDTO(person, medicalRecords, personSameAddress);
@@ -82,7 +83,8 @@ public class AlertService {
         // Map each person to a FireDTO that includes medical information and station number
         return personSameAddress.stream()
                 .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElse(medicalRecordsService.blankMedicalRecords());
                     return new FireDTO(person, fireStation, medicalRecords);
                 })
                 .toList();
@@ -101,8 +103,8 @@ public class AlertService {
         return personRepository.getAllPersons().stream()
                 .filter(person -> fireStationAddresses.contains(person.getAddress()))
                 .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(
-                            person.getFirstName(), person.getLastName());
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElse(medicalRecordsService.blankMedicalRecords());
                     return new FloodStationsDTO(person, medicalRecords);
                 })
                 .toList();
@@ -114,7 +116,8 @@ public class AlertService {
         return personRepository.getAllPersons().stream()
                 .filter(person -> person.getLastName().equals(lastName))
                 .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElse(medicalRecordsService.blankMedicalRecords());
                     return new PersonInfoDTO(person, medicalRecords);
                 })
                 .toList();

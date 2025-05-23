@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * REST controller that handles HTTP requests for managing MedicalRecords objects.
  */
@@ -33,14 +35,19 @@ public class MedicalRecordsController {
      */
     @PostMapping("/medicalRecord")
     public ResponseEntity<MedicalRecords> createMedicalRecords(@RequestBody MedicalRecords medicalRecords) {
-        if (medicalRecordsService.getMedicalRecordsByName(medicalRecords.getFirstName(), medicalRecords.getLastName()) != null) {
+        Optional<MedicalRecords> existingRecord = medicalRecordsService.getMedicalRecordsByName(
+                medicalRecords.getFirstName(), medicalRecords.getLastName());
+
+        if (existingRecord.isPresent()) {
             logger.warn("Medical record already exists for {} {}", medicalRecords.getFirstName(), medicalRecords.getLastName());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        MedicalRecords createdMedicalRecords = medicalRecordsService.createMedicalRecords(medicalRecords);
-        logger.info("Created medical record for {} {}", createdMedicalRecords.getFirstName(), createdMedicalRecords.getLastName());
-        return new ResponseEntity<>(createdMedicalRecords, HttpStatus.CREATED);
+
+        MedicalRecords created = medicalRecordsService.createMedicalRecords(medicalRecords);
+        logger.info("Created medical record for {} {}", created.getFirstName(), created.getLastName());
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
+
 
     /**
      * Retrieves a medical record by first and last name.
@@ -56,25 +63,29 @@ public class MedicalRecordsController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(firstName, lastName);
-        if (medicalRecords == null) {
+        Optional<MedicalRecords> optionalMedicalRecords = medicalRecordsService.getMedicalRecordsByName(firstName, lastName);
+
+        if (optionalMedicalRecords.isEmpty()) {
             logger.info("Medical record not found for {} {}", firstName, lastName);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        logger.info("Retrieved medical record for {} {}", firstName, lastName);
+        MedicalRecords medicalRecords = optionalMedicalRecords.get();
+        logger.info("Retrieved medical record for {} {}", medicalRecords.getFirstName(), medicalRecords.getLastName());
         return new ResponseEntity<>(medicalRecords, HttpStatus.OK);
     }
+
 
     /**
      * Updates an existing medical record.
      *
      * @param medicalRecords the updated medical record
-     * @return {@code 200 OK} with updated record if successful, {@code 404 Not Found} if the record doesn't exist
+     * @return {@code 200 OK} with updated record if successful,
+     * {@code 404 Not Found} if the record doesn't exist
      */
     @PutMapping("/medicalRecord")
     public ResponseEntity<MedicalRecords> updateMedicalRecords(@RequestBody MedicalRecords medicalRecords) {
-        if (medicalRecordsService.getMedicalRecordsByName(medicalRecords.getFirstName(), medicalRecords.getLastName()) == null) {
+        if (medicalRecordsService.getMedicalRecordsByName(medicalRecords.getFirstName(), medicalRecords.getLastName()) == null || medicalRecords.getLastName().isBlank() || medicalRecords.getFirstName().isBlank()) {
             logger.info("Medical record not found for {} {}", medicalRecords.getFirstName(), medicalRecords.getLastName());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -90,7 +101,7 @@ public class MedicalRecordsController {
      * @param firstName the person's first name
      * @param lastName  the person's last name
      * @return {@code 200 OK} if deletion was successful,
-     * {@code 400 Bad Request} for invalid parameters,
+     * {@code 400 Bad Request} for invalid parameters
      */
     @DeleteMapping("/medicalRecord")
     public ResponseEntity<Void> deleteMedicalRecords(@RequestParam String firstName, @RequestParam String lastName) {

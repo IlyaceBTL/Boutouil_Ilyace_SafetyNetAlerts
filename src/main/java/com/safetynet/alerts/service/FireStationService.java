@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FireStationService {
@@ -40,30 +42,33 @@ public class FireStationService {
     }
 
     public FireStationResponseDTO getPersonByStationNumber(String stationNumber) {
-        List<FireStationDTO> fireStationDTOList = new ArrayList<>();
         List<Person> personList = personRepository.getAllPersons();
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
-        for (Person person : personList) {
-            for (FireStation fireStation : fireStationList) {
-                if (person.getAddress().equals(fireStation.getAddress()) && fireStation.getStation().equals(stationNumber)) {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName());
-                    FireStationDTO fireStationDTO = new FireStationDTO(person, medicalRecords);
-                    fireStationDTOList.add(fireStationDTO);
-                }
-            }
 
-        }
-        Integer numberOfAdults = 0;
-        Integer numberOfChildren = 0;
-        for (FireStationDTO fireStationDTO : fireStationDTOList) {
-            if (fireStationDTO.getAge() > 18) {
-                numberOfAdults++;
-            } else {
-                numberOfChildren++;
-            }
-        }
-        return new FireStationResponseDTO(fireStationDTOList, numberOfAdults, numberOfChildren);
+        Set<String> addressesForStation = fireStationList.stream()
+                .filter(fs -> fs.getStation().equals(stationNumber))
+                .map(FireStation::getAddress)
+                .collect(Collectors.toSet());
+
+        List<FireStationDTO> fireStationDTOList = personList.stream()
+                .filter(person -> addressesForStation.contains(person.getAddress()))
+                .map(person -> {
+                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElse(medicalRecordsService.blankMedicalRecords());
+                    return new FireStationDTO(person, medicalRecords);
+                })
+                .toList();
+
+        long numberOfAdults = fireStationDTOList.stream()
+                .filter(dto -> dto.getAge() > 18)
+                .count();
+        long numberOfChildren = fireStationDTOList.stream()
+                .filter(dto -> dto.getAge() <= 18)
+                .count();
+
+        return new FireStationResponseDTO(fireStationDTOList, (int) numberOfAdults, (int) numberOfChildren);
     }
+
 
     public FireStation getFireStationByAddress(String address) {
         return fireStationRepository.getFireStationByAddress(address);

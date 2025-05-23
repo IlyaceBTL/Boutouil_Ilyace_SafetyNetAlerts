@@ -18,8 +18,8 @@ public class AlertController {
     public AlertController(AlertService alertService) {
         this.alertService = alertService;
     }
-
-    @GetMapping("/personInfolastName")
+    //Mapping a revoir avec pas possible avec ce qui est demander
+    @GetMapping("/personInfo")
     public List<PersonInfoDTO> getPersonInfo(@RequestParam String lastName) {
         return alertService.getPersonInfoLastName(lastName);
     }

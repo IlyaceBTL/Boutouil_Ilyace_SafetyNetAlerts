@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MedicalRecordsRepository {
@@ -20,11 +21,10 @@ public class MedicalRecordsRepository {
         medicalRecordsList.add(medicalRecords);
     }
 
-    public MedicalRecords getMedicalRecords(String firstName, String lastName) {
+    public Optional<MedicalRecords> getMedicalRecords(String firstName, String lastName) {
         return medicalRecordsList.stream()
                 .filter(medicalRecordsLooking -> medicalRecordsLooking.getFirstName().equalsIgnoreCase(firstName) && medicalRecordsLooking.getLastName().equalsIgnoreCase(lastName))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     public MedicalRecords updateMedicalRecords(MedicalRecords medicalRecords) {
@@ -38,7 +38,7 @@ public class MedicalRecordsRepository {
 
                     return medicalRecordsUpdate;
                 })
-                .orElse(null);
+                .orElse(blankMedicalRecords());
     }
 
     public void deleteMedicalRecords(String firstName, String lastName) {
@@ -47,4 +47,9 @@ public class MedicalRecordsRepository {
                 .findFirst()
                 .ifPresent(medicalRecordsList::remove);
     }
+
+    public MedicalRecords blankMedicalRecords() {
+        return new MedicalRecords("", "", "", new ArrayList<>(), new ArrayList<>());
+    }
+
 }

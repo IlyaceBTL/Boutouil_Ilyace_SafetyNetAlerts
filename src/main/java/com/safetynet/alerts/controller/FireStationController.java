@@ -46,17 +46,17 @@ public class FireStationController {
     /**
      * Retrieves all persons covered by a specific fire station number.
      *
-     * @param station_number the fire station number
+     * @param stationNumber the fire station number
      * @return DTO containing list of persons and counts
      */
     @GetMapping("/firestation")
-    public ResponseEntity<FireStationResponseDTO> getPersonByStationNumber(@RequestParam String station_number) {
-        if (station_number == null || station_number.isBlank()) {
+    public ResponseEntity<FireStationResponseDTO> getPersonByStationNumber(@RequestParam("stationNumber") String stationNumber) {
+        if (stationNumber == null || stationNumber.isBlank()) {
             logger.error("Station number parameter is missing or blank");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        FireStationResponseDTO response = fireStationService.getPersonByStationNumber(station_number);
-        logger.info("Retrieved fire station response for station number: {}", station_number);
+        FireStationResponseDTO response = fireStationService.getPersonByStationNumber(stationNumber);
+        logger.info("Retrieved fire station response for station number: {}", stationNumber);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

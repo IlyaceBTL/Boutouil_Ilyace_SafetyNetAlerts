@@ -45,4 +45,5 @@ public class FireStationRepository {
                 .findFirst()
                 .orElse(null);
     }
+
 }
