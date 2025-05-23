@@ -9,11 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 
 /**
  * REST controller that handles HTTP requests for managing Person objects.
  */
 @RestController
+@RequestMapping("/person")
 public class PersonController {
 
     private static final Logger logger = LogManager.getLogger(PersonController.class.getName());
@@ -28,19 +30,24 @@ public class PersonController {
      * Creates a new person.
      *
      * @param person the person to create
-     * @return {@code 201 Created} if successful, {@code 409 Conflict} if the person already exists
+     * @return {@code 201 Created} if successful,
+     * {@code 409 Conflict} if the person already exists
+     * {@code 400 Bad Request} if parameters are missing or invalid     *
      */
-    //TODO ESSAYER DE FAIRE FONCTIONNER @OPTIONAL + MODIFIER LES URLS SURTOUT DANS ALERTS
-    @PostMapping("/person")
+    @PostMapping
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
-        if (personService.getPerson(person.getFirstName(), person.getLastName()) != null) {
-            logger.warn("Person already exists");
+        if (person.getLastName() == null || person.getFirstName() == null || person.getFirstName().isBlank() || person.getLastName().isBlank()) {
+            logger.error("Params are missing or blank");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<Person> existingPerson = personService.getPerson(person.getFirstName(), person.getLastName());
+        if (existingPerson.isPresent()) {
+            logger.warn("Attempted to create a person that already exists: {} {}", person.getFirstName(), person.getLastName());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         Person createdPerson = personService.createPerson(person);
-        logger.info("Creating person: {} {}", createdPerson.getFirstName(), createdPerson.getLastName());
+        logger.info("Created person: {} {}", createdPerson.getFirstName(), createdPerson.getLastName());
         return new ResponseEntity<>(createdPerson, HttpStatus.CREATED);
-
     }
 
     /**
@@ -49,42 +56,43 @@ public class PersonController {
      * @param firstName the person's first name
      * @param lastName  the person's last name
      * @return {@code 200 OK} with the person if found,
-     * {@code 400 Bad Request} if parameters are missing or invalid,
-     * {@code 404 Not Found} if the person does not exist
+     * {@code 400 Bad Request} if parameters are invalid,
+     * {@code 404 Not Found} if not found
      */
-    @GetMapping("/person")
+    @GetMapping
     public ResponseEntity<Person> getPerson(@RequestParam String firstName, @RequestParam String lastName) {
-        if (firstName.isEmpty() || firstName.isBlank() || lastName.isBlank() || lastName.isEmpty()) {
-            logger.error("Params are missing or blank");
+        if (firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank()) {
+            logger.error("Missing or blank parameters in getPerson request");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Person person = personService.getPerson(firstName, lastName);
-        if (person == null) {
-            logger.info("Person not found");
+
+        Optional<Person> person = personService.getPerson(firstName, lastName);
+        return person.map(value -> {
+            logger.info("Retrieved person: {} {}", value.getFirstName(), value.getLastName());
+            return new ResponseEntity<>(value, HttpStatus.OK);
+        }).orElseGet(() -> {
+            logger.info("Person not found: {} {}", firstName, lastName);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            logger.info("Person retrieved - First name: {}, Last name: {}", person.getFirstName(), person.getLastName());
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        }
+        });
     }
 
     /**
      * Updates an existing person.
      *
-     * @param person the person with updated information
-     * @return {@code 200 OK} with the updated person if successful,
-     * {@code 404 Not Found} if the person does not exist
+     * @param person the person with updated data
+     * @return {@code 204 No Content} if updated, {@code 404 Not Found} if not found
      */
-    @PutMapping("/person")
-    public ResponseEntity<Person> updatePerson(@RequestBody Person person) {
-        if (personService.getPerson(person.getFirstName(), person.getLastName()) == null) {
-            logger.info("Person not found");
+    @PutMapping
+    public ResponseEntity<Void> updatePerson(@RequestBody Person person) {
+        Optional<Person> existingPerson = personService.getPerson(person.getFirstName(), person.getLastName());
+        if (existingPerson.isEmpty()) {
+            logger.info("Cannot update non-existing person: {} {}", person.getFirstName(), person.getLastName());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Person updatedPerson = personService.updatePerson(person);
-        logger.info("Person Updated - First name: {}, Last name: {}", person.getFirstName(), person.getLastName());
-        return new ResponseEntity<>(updatedPerson, HttpStatus.OK);
 
+        personService.updatePerson(person);
+        logger.info("Updated person: {} {}", person.getFirstName(), person.getLastName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -92,17 +100,16 @@ public class PersonController {
      *
      * @param firstName the person's first name
      * @param lastName  the person's last name
-     * @return {@code 200 OK} if deletion was successful,
-     * {@code 400 Bad Request} if parameters are missing or invalid
+     * @return {@code 204 No Content} if deleted, {@code 400 Bad Request} if parameters are invalid
      */
-    @DeleteMapping("/person")
+    @DeleteMapping
     public ResponseEntity<Void> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
-        if (firstName.isEmpty() || firstName.isBlank() || lastName.isBlank() || lastName.isEmpty()) {
-            logger.error("Params are missing or blank");
+        if (firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank()) {
+            logger.error("Missing or blank parameters in deletePerson request");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         personService.deletePerson(firstName, lastName);
-        logger.info("Person deleted - First name: {}, Last name: {}", firstName, lastName);
-        return new ResponseEntity<>(HttpStatus.OK);
+        logger.info("Deleted person: {} {}", firstName, lastName);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
