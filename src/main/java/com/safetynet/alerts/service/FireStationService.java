@@ -63,7 +63,7 @@ public class FireStationService {
                 .filter(dto -> dto.getAge() > 18)
                 .count();
         long numberOfChildren = fireStationDTOList.stream()
-                .filter(dto -> dto.getAge() <= 18)
+                .filter(dto -> dto.getAge() <= 18 && dto.getAge() >= 0)
                 .count();
 
         return new FireStationResponseDTO(fireStationDTOList, (int) numberOfAdults, (int) numberOfChildren);

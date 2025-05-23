@@ -20,9 +20,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service responsible for reading initial data from the JSON file and loading it
+ * into the application's repositories.
+ */
 @Service
 public class JSONReaderService {
-
 
     private static final Logger logger = Logger.getLogger(JSONReaderService.class.getName());
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -31,6 +34,13 @@ public class JSONReaderService {
     private final FireStationRepository fireStationRepository;
     private final MedicalRecordsRepository medicalRecordsRepository;
 
+    /**
+     * Constructor for JSONReaderService, injecting required repositories.
+     *
+     * @param personRepository         the repository for storing person data
+     * @param fireStationRepository    the repository for storing fire station data
+     * @param medicalRecordsRepository the repository for storing medical records data
+     */
     @Autowired
     private JSONReaderService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsRepository medicalRecordsRepository) {
         this.personRepository = personRepository;
@@ -38,6 +48,11 @@ public class JSONReaderService {
         this.medicalRecordsRepository = medicalRecordsRepository;
     }
 
+    /**
+     * Initializes the service after Spring context is created.
+     * Reads the `data.json` file and loads persons, fire stations, and medical records
+     * into memory using their respective repositories.
+     */
     @PostConstruct
     public void loadData() {
         String filepath = "src/main/resources/data.json";
@@ -52,6 +67,12 @@ public class JSONReaderService {
         }
     }
 
+    /**
+     * Loads and parses the "persons" section from the JSON tree,
+     * and stores each entry in the PersonRepository.
+     *
+     * @param root the root node of the parsed JSON structure
+     */
     public void loadPerson(JsonNode root) {
         List<Person> personList;
         try {
@@ -60,16 +81,20 @@ public class JSONReaderService {
             personList = Arrays.asList(personsArray);
             for (Person person : personList) {
                 personRepository.addPerson(person);
-
             }
-            logger.info(personList.size() + " Person load from data.json");
+            logger.info(personList.size() + " Person(s) loaded from data.json");
         } catch (JsonProcessingException e) {
             logger.log(Level.SEVERE, "Error loading person", e);
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Loads and parses the "firestations" section from the JSON tree,
+     * and stores each entry in the FireStationRepository.
+     *
+     * @param root the root node of the parsed JSON structure
+     */
     public void loadFireStation(JsonNode root) {
         List<FireStation> fireStationList;
         try {
@@ -79,13 +104,19 @@ public class JSONReaderService {
             for (FireStation fireStation : fireStationList) {
                 fireStationRepository.addFireStation(fireStation);
             }
-            logger.info(fireStationList.size() + " FireStation load from data.json");
+            logger.info(fireStationList.size() + " FireStation(s) loaded from data.json");
         } catch (JsonProcessingException e) {
             logger.log(Level.SEVERE, "Error loading FireStation", e);
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Loads and parses the "medicalrecords" section from the JSON tree,
+     * and stores each entry in the MedicalRecordsRepository.
+     *
+     * @param root the root node of the parsed JSON structure
+     */
     public void loadMedicalRecords(JsonNode root) {
         List<MedicalRecords> medicalRecordsList;
         try {
@@ -95,12 +126,10 @@ public class JSONReaderService {
             for (MedicalRecords medicalRecords : medicalRecordsList) {
                 medicalRecordsRepository.addMedicalRecords(medicalRecords);
             }
-            logger.info(medicalRecordsList.size() + " MedicalRecords loaded from data.json");
+            logger.info(medicalRecordsList.size() + " MedicalRecord(s) loaded from data.json");
         } catch (JsonProcessingException e) {
             logger.log(Level.SEVERE, "Error loading MedicalRecords", e);
             throw new RuntimeException(e);
         }
-
     }
-
 }

@@ -78,4 +78,8 @@ public class PersonRepository {
                 .ifPresent(personList::remove);
     }
 
+    public Person blankPerson(){
+        return new Person("","","","","","","");
+    }
+
 }
