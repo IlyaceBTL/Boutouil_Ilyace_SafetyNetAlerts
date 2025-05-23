@@ -37,7 +37,7 @@ public class PersonController {
     @PostMapping
     public ResponseEntity<Person> createPerson(@RequestBody Person person) {
         if (person.getLastName() == null || person.getFirstName() == null || person.getFirstName().isBlank() || person.getLastName().isBlank()) {
-            logger.error("Params are missing or blank");
+            logger.error(" Params are missing or blank");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Optional<Person> existingPerson = personService.getPerson(person.getFirstName(), person.getLastName());
@@ -118,7 +118,7 @@ public class PersonController {
         }
         Optional<Person> personExisting = personService.getPerson(firstName, lastName);
         if (personExisting.isEmpty()) {
-            logger.info("Person not found: {} {}", firstName, lastName);
+            logger.info("Person not found : {} {}", firstName, lastName);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         personService.deletePerson(firstName, lastName);

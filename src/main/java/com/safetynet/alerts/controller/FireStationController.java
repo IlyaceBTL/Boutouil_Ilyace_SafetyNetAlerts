@@ -38,7 +38,7 @@ public class FireStationController {
     @PostMapping("/firestation")
     public ResponseEntity<FireStation> createFireStation(@RequestBody FireStation fireStation) {
         if (fireStation.getAddress() == null || fireStation.getAddress().isBlank() || fireStation.getStation() == null || fireStation.getStation().isBlank()) {
-            logger.error("Params are missing or blank");
+            logger.error("Params are missing or blank ");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Optional<FireStation> existingFireStation = fireStationService.getFireStationByAddress(fireStation.getAddress());

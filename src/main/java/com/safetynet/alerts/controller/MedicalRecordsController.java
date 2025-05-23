@@ -68,7 +68,7 @@ public class MedicalRecordsController {
         Optional<MedicalRecords> optionalMedicalRecords = medicalRecordsService.getMedicalRecordsByName(firstName, lastName);
 
         if (optionalMedicalRecords.isEmpty()) {
-            logger.info("Medical record not found for {} {}", firstName, lastName);
+            logger.info(" Medical record not found for {} {}", firstName, lastName);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -117,7 +117,7 @@ public class MedicalRecordsController {
     @DeleteMapping("/medicalRecord")
     public ResponseEntity<Void> deleteMedicalRecords(@RequestParam String firstName, @RequestParam String lastName) {
         if (firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank()) {
-            logger.error("Params are missing or blank");
+            logger.error("Params are missing or blank ");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
