@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * REST controller that handles HTTP requests for managing FireStation objects.
  */
@@ -30,14 +32,21 @@ public class FireStationController {
      *
      * @param fireStation the fire station entity to create
      * @return {@code 201 Created} if successful,
+     * {@code 400 Bad Request} if parameters are missing or invalid
      * {@code 409 Conflict} if the assignment already exists
      */
     @PostMapping("/firestation")
     public ResponseEntity<FireStation> createFireStation(@RequestBody FireStation fireStation) {
-        if (fireStationService.getFireStationByAddress(fireStation.getAddress()) != null) {
+        if (fireStation.getAddress() == null || fireStation.getAddress().isBlank() || fireStation.getStation() == null || fireStation.getStation().isBlank()) {
+            logger.error("Params are missing or blank");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<FireStation> existingFireStation = fireStationService.getFireStationByAddress(fireStation.getAddress());
+        if (existingFireStation.isPresent()) {
             logger.warn("Fire station already exists at address: {}", fireStation.getAddress());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+
         FireStation createdFireStation = fireStationService.createFireStation(fireStation);
         logger.info("Created fire station at address: {}, station: {}", createdFireStation.getAddress(), createdFireStation.getStation());
         return new ResponseEntity<>(createdFireStation, HttpStatus.CREATED);
@@ -55,6 +64,7 @@ public class FireStationController {
             logger.error("Station number parameter is missing or blank");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
         FireStationResponseDTO response = fireStationService.getPersonByStationNumber(stationNumber);
         logger.info("Retrieved fire station response for station number: {}", stationNumber);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -69,13 +79,19 @@ public class FireStationController {
      */
     @PutMapping("/firestation")
     public ResponseEntity<FireStation> updateFireStation(@RequestBody FireStation fireStation) {
-        if (fireStationService.getFireStationByAddress(fireStation.getAddress()) == null) {
-            logger.info("Fire station not found at address: {}", fireStation.getAddress());
+        if (fireStation.getAddress() == null || fireStation.getAddress().isBlank() || fireStation.getStation() == null || fireStation.getStation().isBlank()) {
+            logger.error("Params are missing or blank");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<FireStation> existingFireStation = fireStationService.getFireStationByAddress(fireStation.getAddress());
+        if (existingFireStation.isEmpty()) {
+            logger.info("Fire station non-existing at address: {}", fireStation.getAddress());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        FireStation updatedFireStation = fireStationService.updateFireStation(fireStation);
-        logger.info("Updated fire station at address: {}, new station: {}", updatedFireStation.getAddress(), updatedFireStation.getStation());
-        return new ResponseEntity<>(updatedFireStation, HttpStatus.OK);
+
+        fireStationService.updateFireStation(fireStation);
+        logger.info("Updated fire station at address: {}, new station: {}", fireStation.getAddress(), fireStation.getStation());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -92,10 +108,13 @@ public class FireStationController {
             logger.error("Address parameter is missing or blank");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if (fireStationService.getFireStationByAddress(address) == null) {
+
+        Optional<FireStation> existingFireStation = fireStationService.getFireStationByAddress(address);
+        if (existingFireStation.isEmpty()) {
             logger.info("Fire station not found at address: {}", address);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         fireStationService.deleteFireStation(address);
         logger.info("Deleted fire station at address: {}", address);
         return new ResponseEntity<>(HttpStatus.OK);

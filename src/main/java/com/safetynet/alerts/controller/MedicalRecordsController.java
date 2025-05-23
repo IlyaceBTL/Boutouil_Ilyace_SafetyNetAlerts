@@ -32,7 +32,7 @@ public class MedicalRecordsController {
      *
      * @param medicalRecords The medical record to create.
      * @return {@code 201 Created} if successful,
-     *         {@code 409 Conflict} if the record already exists.
+     * {@code 409 Conflict} if the record already exists.
      */
     @PostMapping("/medicalRecord")
     public ResponseEntity<MedicalRecords> createMedicalRecords(@RequestBody MedicalRecords medicalRecords) {
@@ -55,8 +55,8 @@ public class MedicalRecordsController {
      * @param firstName The person's first name.
      * @param lastName  The person's last name.
      * @return {@code 200 OK} and the medical record if found,
-     *         {@code 400 Bad Request} if parameters are missing or invalid,
-     *         {@code 404 Not Found} if the record doesn't exist.
+     * {@code 400 Bad Request} if parameters are missing or invalid,
+     * {@code 404 Not Found} if the record doesn't exist.
      */
     @GetMapping("/medicalRecord")
     public ResponseEntity<MedicalRecords> getMedicalRecords(@RequestParam String firstName, @RequestParam String lastName) {
@@ -82,8 +82,8 @@ public class MedicalRecordsController {
      *
      * @param medicalRecords The updated medical record object.
      * @return {@code 204 No Content} if update is successful,
-     *         {@code 400 Bad Request} if input parameters are missing or invalid,
-     *         {@code 404 Not Found} if no matching record exists.
+     * {@code 400 Bad Request} if input parameters are missing or invalid,
+     * {@code 404 Not Found} if no matching record exists.
      */
     @PutMapping("/medicalRecord")
     public ResponseEntity<Void> updateMedicalRecords(@RequestBody MedicalRecords medicalRecords) {
@@ -111,7 +111,8 @@ public class MedicalRecordsController {
      * @param firstName The person's first name.
      * @param lastName  The person's last name.
      * @return {@code 200 OK} if the record was successfully deleted,
-     *         {@code 400 Bad Request} if input parameters are missing or invalid.
+     * {@code 400 Bad Request} if input parameters are missing or invalid.
+     * {@code 404 Not Found} if the record doesn't exist.
      */
     @DeleteMapping("/medicalRecord")
     public ResponseEntity<Void> deleteMedicalRecords(@RequestParam String firstName, @RequestParam String lastName) {
@@ -120,6 +121,11 @@ public class MedicalRecordsController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        Optional<MedicalRecords> existingMedicalRecords = medicalRecordsService.getMedicalRecordsByName(firstName, lastName);
+        if (existingMedicalRecords.isEmpty()) {
+            logger.info("Medical record not existing for {} {}", firstName, lastName);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         medicalRecordsService.deleteMedicalRecords(firstName, lastName);
         logger.info("Deleted medical record for {} {}", firstName, lastName);
         return new ResponseEntity<>(HttpStatus.OK);

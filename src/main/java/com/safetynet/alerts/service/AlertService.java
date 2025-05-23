@@ -1,5 +1,6 @@
 package com.safetynet.alerts.service;
 
+import com.safetynet.alerts.controller.MedicalRecordsController;
 import com.safetynet.alerts.dto.*;
 import com.safetynet.alerts.model.FireStation;
 import com.safetynet.alerts.model.MedicalRecords;
@@ -7,17 +8,19 @@ import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.PersonRepository;
 import com.safetynet.alerts.utils.DateUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Service
 public class AlertService {
+
+    private static final Logger logger = LogManager.getLogger(AlertService.class.getName());
 
     private final PersonRepository personRepository;
     private final FireStationRepository fireStationRepository;
@@ -30,7 +33,6 @@ public class AlertService {
         this.medicalRecordsService = medicalRecordsService;
     }
 
-    //TODO reworking on all methode to use .stream instead of loops for
     public List<ChildAlertDTO> getChildByAddress(String address) {
 
         List<Person> persons = personRepository.getAllPersons();
@@ -75,21 +77,29 @@ public class AlertService {
     }
 
     public List<FireDTO> getPersonByAddress(String address) {
-        FireStation fireStation = fireStationRepository.getFireStationByAddress(address);
-        // Get all persons living at the given address
-        List<Person> personSameAddress = personRepository.getAllPersons().stream()
-                .filter(person -> person.getAddress().equals(address))
-                .toList();
-        // Map each person to a FireDTO that includes medical information and station number
-        return personSameAddress.stream()
+        // Retrieve the fire station assignment, or a blank one if none exists
+        FireStation station = fireStationRepository
+                .getFireStationByAddress(address)
+                .orElseGet(() -> {
+                    logger.warn("No fire station assigned for address: {}", address);
+                    return fireStationRepository.blankFireStation();
+                });
+
+        // Filter all persons by matching address
+        return personRepository.getAllPersons().stream()
+                .filter(person -> person.getAddress().equalsIgnoreCase(address))
                 .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName())
-                            .orElse(medicalRecordsService.blankMedicalRecords());
-                    return new FireDTO(person, fireStation, medicalRecords);
+                    // Retrieve medical records or blank if absent
+                    MedicalRecords medicalRecords = medicalRecordsService
+                            .getMedicalRecordsByName(person.getFirstName(), person.getLastName())
+                            .orElseGet(medicalRecordsService::blankMedicalRecords);
+
+                    // Build and return the DTO
+                    return new FireDTO(person, station, medicalRecords);
                 })
                 .toList();
-
     }
+
 
     public List<FloodStationsDTO> getPersonByListOfStations(List<String> fireStationsNumber) {
         // Get the set of addresses covered by the provided station numbers

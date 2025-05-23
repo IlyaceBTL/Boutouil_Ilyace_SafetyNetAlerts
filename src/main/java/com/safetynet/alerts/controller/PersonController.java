@@ -80,10 +80,16 @@ public class PersonController {
      * Updates an existing person.
      *
      * @param person the person with updated data
-     * @return {@code 204 No Content} if updated, {@code 404 Not Found} if not found
+     * @return {@code 204 No Content} if updated,
+     * {@code 400 Bad Request} if parameters are missing or invalid
+     * {@code 404 Not Found} if not found
      */
     @PutMapping
     public ResponseEntity<Void> updatePerson(@RequestBody Person person) {
+        if (person.getLastName() == null || person.getFirstName() == null || person.getFirstName().isBlank() || person.getLastName().isBlank()) {
+            logger.error("Params are missing or blank");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Optional<Person> existingPerson = personService.getPerson(person.getFirstName(), person.getLastName());
         if (existingPerson.isEmpty()) {
             logger.info("Cannot update non-existing person: {} {}", person.getFirstName(), person.getLastName());
@@ -100,13 +106,20 @@ public class PersonController {
      *
      * @param firstName the person's first name
      * @param lastName  the person's last name
-     * @return {@code 204 No Content} if deleted, {@code 400 Bad Request} if parameters are invalid
+     * @return {@code 204 No Content} if deleted,
+     * {@code 400 Bad Request} if parameters are invalid,
+     * {@code 404 Not Found} if not found
      */
     @DeleteMapping
     public ResponseEntity<Void> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
         if (firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank()) {
             logger.error("Missing or blank parameters in deletePerson request");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<Person> personExisting = personService.getPerson(firstName, lastName);
+        if (personExisting.isEmpty()) {
+            logger.info("Person not found: {} {}", firstName, lastName);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         personService.deletePerson(firstName, lastName);
         logger.info("Deleted person: {} {}", firstName, lastName);
