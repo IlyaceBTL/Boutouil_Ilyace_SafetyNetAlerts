@@ -25,7 +25,7 @@ public class AlertController {
         this.alertService = alertService;
     }
 
-    //Mauvais Mapping pas Rest
+    //Request Param au lieu du pathVariable
     /**
      * Retrieves a list of person information by last name.
      *
