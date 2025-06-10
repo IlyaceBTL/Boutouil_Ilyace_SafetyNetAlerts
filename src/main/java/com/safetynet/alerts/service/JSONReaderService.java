@@ -11,6 +11,7 @@ import com.safetynet.alerts.repository.MedicalRecordsRepository;
 import com.safetynet.alerts.repository.PersonRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -26,6 +27,9 @@ import java.util.logging.Logger;
  */
 @Service
 public class JSONReaderService {
+
+    @Value("${data.path}")
+    private String dataPath;
 
     private static final Logger logger = Logger.getLogger(JSONReaderService.class.getName());
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -55,9 +59,8 @@ public class JSONReaderService {
      */
     @PostConstruct
     public void loadData() {
-        String filepath = "src/main/resources/data.json";
         try {
-            JsonNode root = objectMapper.readTree(new File(filepath));
+            JsonNode root = objectMapper.readTree(new File(dataPath));
             loadPerson(root);
             loadFireStation(root);
             loadMedicalRecords(root);

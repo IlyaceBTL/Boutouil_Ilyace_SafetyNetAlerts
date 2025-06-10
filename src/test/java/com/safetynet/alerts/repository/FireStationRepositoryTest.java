@@ -58,12 +58,15 @@ class FireStationRepositoryTest {
 
         assertEquals(1,result.size());
         assertThrows(IndexOutOfBoundsException.class, () -> result.get(1));
+
+        Optional<FireStation>fireStation = repository.getFireStationByAddress("2 Station");
+        assertTrue(fireStation.isEmpty());
     }
 
     @Test
     void getFireStationByAddress() {
         Optional<FireStation> result = repository.getFireStationByAddress("1 Station");
-        assertTrue(result.isPresent(), "FireStation should be present for address '1 Station'");
+        assertTrue(result.isPresent());
         assertEquals("1 Station", result.get().getAddress());
         assertEquals("1", result.get().getStation());
     }
