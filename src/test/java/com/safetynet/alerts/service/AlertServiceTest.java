@@ -6,15 +6,30 @@ import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.model.Person;
 import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.PersonRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the {@link AlertService} class.
+ * <p>
+ * These tests verify the behavior of alert-related methods, including:
+ * - Retrieving children by address
+ * - Fetching phone numbers by fire station number
+ * - Getting person information by address
+ * - Obtaining emails by city
+ * - Getting person info by last name
+ * - Retrieving persons by list of fire station numbers
+ * <p>
+ * Mockito is used to mock dependencies such as PersonRepository, FireStationRepository, and MedicalRecordsService.
+ */
+@ExtendWith(MockitoExtension.class)
 class AlertServiceTest {
 
     @InjectMocks
@@ -29,11 +44,10 @@ class AlertServiceTest {
     @Mock
     private MedicalRecordsService medicalRecordsService;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
-
+    /**
+     * Test that {@link AlertService#getChildByAddress(String)} returns only children living at the given address.
+     * Children are identified by their birthdate indicating an age under a certain threshold.
+     */
     @Test
     void getChildByAddress_shouldReturnChildrenOnly() {
         Person child = new Person("Tim", "Brown", "123 Street", "City", "12345", "000-000", "email@example.com");
@@ -49,9 +63,12 @@ class AlertServiceTest {
         List<ChildAlertDTO> result = alertService.getChildByAddress("123 Street");
 
         assertEquals(1, result.size());
-        assertEquals("Tim", result.getFirst().getFirstName());
+        assertEquals("Tim", result.get(0).getFirstName());
     }
 
+    /**
+     * Test that {@link AlertService#getChildByAddress(String)} returns an empty list when no children live at the address.
+     */
     @Test
     void getChildByAddress_noChildren_shouldReturnEmpty() {
         Person adult = new Person("John", "Brown", "123 Street", "City", "12345", "111-111", "adult@example.com");
@@ -65,6 +82,10 @@ class AlertServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    /**
+     * Test that {@link AlertService#getPhoneNumberByFireStation(String)} returns phone numbers of persons
+     * covered by the specified fire station number.
+     */
     @Test
     void getPhoneNumberByFireStation_shouldReturnMatchingPhones() {
         Person person = new Person("Alice", "Smith", "456 Avenue", "City", "12345", "999-999", "alice@example.com");
@@ -76,9 +97,13 @@ class AlertServiceTest {
         List<PhoneAlertDTO> result = alertService.getPhoneNumberByFireStation("2");
 
         assertEquals(1, result.size());
-        assertEquals("999-999", result.getFirst().getPhone());
+        assertEquals("999-999", result.get(0).getPhone());
     }
 
+    /**
+     * Test that {@link AlertService#getPhoneNumberByFireStation(String)} returns an empty list
+     * if no phone numbers match the fire station number.
+     */
     @Test
     void getPhoneNumberByFireStation_noMatch_shouldReturnEmpty() {
         when(personRepository.getAllPersons()).thenReturn(Collections.emptyList());
@@ -89,6 +114,10 @@ class AlertServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    /**
+     * Test that {@link AlertService#getPersonByAddress(String)} returns a list of {@link FireDTO}
+     * with person details and fire station info for the given address.
+     */
     @Test
     void getPersonByAddress_shouldReturnFireDTO() {
         Person person = new Person("Tom", "Doe", "789 Road", "City", "12345", "222-222", "tom@example.com");
@@ -102,10 +131,14 @@ class AlertServiceTest {
         List<FireDTO> result = alertService.getPersonByAddress("789 Road");
 
         assertEquals(1, result.size());
-        assertEquals("Tom", result.getFirst().getFirstName());
-        assertEquals(29, result.getFirst().getAge()); // assuming age is calculated correctly in service
+        assertEquals("Tom", result.get(0).getFirstName());
+        assertEquals(29, result.get(0).getAge()); // assuming age is calculated correctly in service
     }
 
+    /**
+     * Test that {@link AlertService#getPersonByAddress(String)} returns an empty list if
+     * no fire station is found for the given address.
+     */
     @Test
     void getPersonByAddress_noFireStation_shouldReturnEmpty() {
         when(fireStationRepository.getFireStationByAddress("unknown")).thenReturn(Optional.empty());
@@ -115,6 +148,10 @@ class AlertServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    /**
+     * Test that {@link AlertService#getEmailByCity(String)} returns a list of unique email addresses
+     * for all persons residing in the specified city.
+     */
     @Test
     void getEmailByCity_shouldReturnUniqueEmails() {
         Person p1 = new Person("Anna", "Lee", "101 Blvd", "Paris", "75000", "333-333", "anna@example.com");
@@ -132,6 +169,10 @@ class AlertServiceTest {
         assertTrue(emails.contains("mark@example.com"));
     }
 
+    /**
+     * Test that {@link AlertService#getEmailByCity(String)} returns an empty list if
+     * no persons are found in the specified city.
+     */
     @Test
     void getEmailByCity_noEmails_shouldReturnEmpty() {
         when(personRepository.getAllPersons()).thenReturn(Collections.emptyList());
@@ -141,6 +182,10 @@ class AlertServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    /**
+     * Test that {@link AlertService#getPersonInfoLastName(String)} returns person information
+     * filtered by last name.
+     */
     @Test
     void getPersonInfoLastName_shouldReturnMatchingLastName() {
         Person p = new Person("Emily", "Stone", "1 St", "City", "12345", "555-555", "emily@example.com");
@@ -152,9 +197,13 @@ class AlertServiceTest {
         List<PersonInfoDTO> result = alertService.getPersonInfoLastName("Stone");
 
         assertEquals(1, result.size());
-        assertEquals("Stone", result.getFirst().getLastName());
+        assertEquals("Stone", result.get(0).getLastName());
     }
 
+    /**
+     * Test that {@link AlertService#getPersonInfoLastName(String)} returns an empty list if
+     * no matching last name is found.
+     */
     @Test
     void getPersonInfoLastName_noMatch_shouldReturnEmpty() {
         when(personRepository.getAllPersons()).thenReturn(Collections.emptyList());
@@ -164,6 +213,10 @@ class AlertServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    /**
+     * Test that {@link AlertService#getPersonByListOfStations(List)} returns flood station data transfer objects
+     * with person info for the given list of fire station numbers.
+     */
     @Test
     void getPersonByListOfStations_shouldReturnFloodStationsDTO() {
         Person p = new Person("Lucy", "Heart", "12 Street", "City", "12345", "111-222", "lucy@example.com");
@@ -177,9 +230,13 @@ class AlertServiceTest {
         List<FloodStationsDTO> result = alertService.getPersonByListOfStations(List.of("3"));
 
         assertEquals(1, result.size());
-        assertEquals("Lucy", result.getFirst().getFirstName());
+        assertEquals("Lucy", result.get(0).getFirstName());
     }
 
+    /**
+     * Test that {@link AlertService#getPersonByListOfStations(List)} returns an empty list if
+     * no matching fire stations are found.
+     */
     @Test
     void getPersonByListOfStations_noMatch_shouldReturnEmpty() {
         when(fireStationRepository.getAllFireStation()).thenReturn(Collections.emptyList());
@@ -188,6 +245,11 @@ class AlertServiceTest {
 
         assertTrue(result.isEmpty());
     }
+
+    /**
+     * Test the constructor, getters, and setters of {@link FireStationDTO}.
+     * Ensures the DTO behaves as expected when properties are set and retrieved.
+     */
     @Test
     void testConstructorAndGettersAndSetters() {
         FireStationDTO dto = new FireStationDTO("John", "Doe", "123 Street", "000-000", 35);
@@ -200,13 +262,13 @@ class AlertServiceTest {
 
         dto.setFirstName("Jane");
         dto.setLastName("Smith");
-        dto.setAddress("456 Avenue");
+        dto.setAddress("456 Road");
         dto.setPhone("111-111");
         dto.setAge(40);
 
         assertEquals("Jane", dto.getFirstName());
         assertEquals("Smith", dto.getLastName());
-        assertEquals("456 Avenue", dto.getAddress());
+        assertEquals("456 Road", dto.getAddress());
         assertEquals("111-111", dto.getPhone());
         assertEquals(40, dto.getAge());
     }

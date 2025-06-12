@@ -46,7 +46,7 @@ public class JSONReaderService {
      * @param medicalRecordsRepository the repository for storing medical records data
      */
     @Autowired
-    private JSONReaderService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsRepository medicalRecordsRepository) {
+    public JSONReaderService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsRepository medicalRecordsRepository) {
         this.personRepository = personRepository;
         this.fireStationRepository = fireStationRepository;
         this.medicalRecordsRepository = medicalRecordsRepository;

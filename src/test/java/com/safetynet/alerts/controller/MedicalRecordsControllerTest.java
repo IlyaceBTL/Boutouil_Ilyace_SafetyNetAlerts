@@ -4,9 +4,10 @@ import com.safetynet.alerts.model.MedicalRecords;
 import com.safetynet.alerts.service.MedicalRecordsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -16,6 +17,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the {@link MedicalRecordsController} class.
+ * These tests validate behavior for creating, retrieving, updating, and deleting
+ * {@link MedicalRecords} via the controller layer, using mocked service dependencies.
+ */
+@ExtendWith(MockitoExtension.class)
 class MedicalRecordsControllerTest {
 
     @Mock
@@ -26,9 +33,11 @@ class MedicalRecordsControllerTest {
 
     private MedicalRecords sampleRecord;
 
+    /**
+     * Initializes a sample medical record used in multiple test cases.
+     */
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         sampleRecord = new MedicalRecords(
                 "John",
                 "Doe",
@@ -38,6 +47,10 @@ class MedicalRecordsControllerTest {
         );
     }
 
+    /**
+     * Test the successful creation of a new medical record.
+     * Verifies that the service is called and HTTP status 201 is returned.
+     */
     @Test
     void createMedicalRecords_success() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.empty());
@@ -50,6 +63,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService).createMedicalRecords(sampleRecord);
     }
 
+    /**
+     * Test creation of a medical record that already exists.
+     * Expects HTTP 409 Conflict and no service method invocation.
+     */
     @Test
     void createMedicalRecords_conflict() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.of(sampleRecord));
@@ -60,6 +77,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService, never()).createMedicalRecords(any());
     }
 
+    /**
+     * Test retrieving an existing medical record.
+     * Expects HTTP 200 OK and correct data in the response body.
+     */
     @Test
     void getMedicalRecords_success() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.of(sampleRecord));
@@ -70,6 +91,10 @@ class MedicalRecordsControllerTest {
         assertEquals(sampleRecord, response.getBody());
     }
 
+    /**
+     * Test retrieving a non-existing medical record.
+     * Expects HTTP 404 Not Found.
+     */
     @Test
     void getMedicalRecords_notFound() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.empty());
@@ -79,6 +104,10 @@ class MedicalRecordsControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
+    /**
+     * Test retrieving a medical record with invalid input (null or empty name).
+     * Expects HTTP 400 Bad Request.
+     */
     @Test
     void getMedicalRecords_badRequest() {
         ResponseEntity<MedicalRecords> response1 = medicalRecordsController.getMedicalRecords(null, "Doe");
@@ -88,6 +117,10 @@ class MedicalRecordsControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response2.getStatusCode());
     }
 
+    /**
+     * Test successful update of an existing medical record.
+     * Expects HTTP 204 No Content and service method invocation.
+     */
     @Test
     void updateMedicalRecords_success() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.of(sampleRecord));
@@ -98,6 +131,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService).updateMedicalRecords(sampleRecord);
     }
 
+    /**
+     * Test update of a non-existing medical record.
+     * Expects HTTP 404 Not Found and no service method invocation.
+     */
     @Test
     void updateMedicalRecords_notFound() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.empty());
@@ -108,6 +145,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService, never()).updateMedicalRecords(any());
     }
 
+    /**
+     * Test update with invalid input (missing firstName and lastName).
+     * Expects HTTP 400 Bad Request.
+     */
     @Test
     void updateMedicalRecords_badRequest() {
         MedicalRecords badRecord = new MedicalRecords(null, "", null, null, null);
@@ -118,6 +159,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService, never()).updateMedicalRecords(any());
     }
 
+    /**
+     * Test successful deletion of an existing medical record.
+     * Expects HTTP 200 OK and service method invocation.
+     */
     @Test
     void deleteMedicalRecords_success() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.of(sampleRecord));
@@ -128,6 +173,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService).deleteMedicalRecords("John", "Doe");
     }
 
+    /**
+     * Test deletion of a non-existing medical record.
+     * Expects HTTP 404 Not Found and no service method invocation.
+     */
     @Test
     void deleteMedicalRecords_notFound() {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.empty());
@@ -138,6 +187,10 @@ class MedicalRecordsControllerTest {
         verify(medicalRecordsService, never()).deleteMedicalRecords(any(), any());
     }
 
+    /**
+     * Test deletion with invalid input (null or empty parameters).
+     * Expects HTTP 400 Bad Request and no service call.
+     */
     @Test
     void deleteMedicalRecords_badRequest() {
         ResponseEntity<Void> response1 = medicalRecordsController.deleteMedicalRecords(null, "Doe");

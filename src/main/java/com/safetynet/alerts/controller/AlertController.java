@@ -33,7 +33,7 @@ public class AlertController {
      * @return list of {@link PersonInfoDTO} or {@code 400 Bad Request} if missing,
      * {@code 404 Not Found} if none found
      */
-    @GetMapping("/personInfoLastName={lastName}")
+    @GetMapping("/personInfolastName={lastName}")
     public ResponseEntity<List<PersonInfoDTO>> getPersonInfo(@PathVariable("lastName") String lastName) {
         if (lastName == null || lastName.isBlank()) {
             logger.error("lastName parameter is missing or blank");

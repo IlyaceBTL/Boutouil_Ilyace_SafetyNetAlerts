@@ -9,10 +9,18 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link PersonRepository} class.
+ * This test class validates the CRUD operations performed by the repository
+ * on the {@link Person} model: retrieval, insertion, update, and deletion.
+ */
 class PersonRepositoryTest {
 
     private PersonRepository repository;
 
+    /**
+     * Initializes the repository with two predefined persons before each test.
+     */
     @BeforeEach
     void setUp() {
         repository = new PersonRepository();
@@ -21,6 +29,9 @@ class PersonRepositoryTest {
         repository.addPerson(new Person("Jane", "Smith", "456 Elm St", "Shelbyville", "67890", "222-222-2222", "jane.smith@example.com"));
     }
 
+    /**
+     * Test that verifies all persons are correctly retrieved from the repository.
+     */
     @Test
     void getAllPersons() {
         List<Person> result = repository.getAllPersons();
@@ -30,6 +41,9 @@ class PersonRepositoryTest {
         assertEquals("Jane", result.get(1).getFirstName());
     }
 
+    /**
+     * Test that verifies a new person is added to the repository.
+     */
     @Test
     void addPerson() {
         repository.addPerson(new Person("Alice", "Brown", "789 Oak St", "Capital City", "54321", "333-333-3333", "alice.brown@example.com"));
@@ -39,6 +53,10 @@ class PersonRepositoryTest {
         assertEquals("Alice", result.get(2).getFirstName());
     }
 
+    /**
+     * Test retrieving a specific person by first and last name.
+     * Ensures the person exists and has correct attributes.
+     */
     @Test
     void getPerson() {
         Optional<Person> result = repository.getPerson("John", "Doe");
@@ -48,6 +66,10 @@ class PersonRepositoryTest {
         assertEquals("Springfield", result.get().getCity());
     }
 
+    /**
+     * Test updating an existing person’s information.
+     * Verifies that all updated fields are correctly saved.
+     */
     @Test
     void updatePerson() {
         repository.updatePerson(new Person("Jane", "Smith", "999 Maple Ave", "New Town", "99999", "444-444-4444", "jane.new@example.com"));
@@ -60,6 +82,10 @@ class PersonRepositoryTest {
         assertEquals("jane.new@example.com", result.get().getEmail());
     }
 
+    /**
+     * Test deleting a person from the repository.
+     * Verifies the person is removed and cannot be retrieved afterward.
+     */
     @Test
     void deletePerson() {
         repository.deletePerson("Jane", "Smith");

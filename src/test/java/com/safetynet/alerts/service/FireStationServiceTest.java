@@ -14,6 +14,11 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+/**
+ * Tests for FireStationService class.
+ * These tests check if the service correctly returns people covered by a fire station,
+ * and counts how many adults and children are there.
+ */
 class FireStationServiceTest {
 
     private PersonRepository personRepository;
@@ -21,6 +26,9 @@ class FireStationServiceTest {
     private MedicalRecordsService medicalRecordsService;
     private FireStationService fireStationService;
 
+    /**
+     * Setup mocks and service before each test.
+     */
     @BeforeEach
     void setUp() {
         personRepository = mock(PersonRepository.class);
@@ -29,6 +37,11 @@ class FireStationServiceTest {
         fireStationService = new FireStationService(personRepository, fireStationRepository, medicalRecordsService);
     }
 
+    /**
+     * Test getPersonByStationNumber method.
+     * It should return the list of people covered by the fire station number,
+     * and count the adults and children correctly.
+     */
     @Test
     void testGetPersonByStationNumber() {
         String stationNumber = "1";
@@ -49,10 +62,8 @@ class FireStationServiceTest {
         when(medicalRecordsService.getMedicalRecordsByName("John", "Doe")).thenReturn(Optional.of(adultRecord));
         when(medicalRecordsService.getMedicalRecordsByName("Jane", "Doe")).thenReturn(Optional.of(childRecord));
 
-        // When
         FireStationResponseDTO result = fireStationService.getPersonByStationNumber(stationNumber);
 
-        // Then
         assertThat(result).isNotNull();
         assertThat(result.getNumberOfAdults()).isEqualTo(1);
         assertThat(result.getNumberOfChildren()).isEqualTo(1);

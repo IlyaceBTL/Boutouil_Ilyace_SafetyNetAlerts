@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 public class DateUtils {
 
     public static Integer calculateAge(String birthDate) {
-        if(birthDate.isEmpty() || birthDate.isBlank()){
+        if(birthDate.isEmpty()){
             return -1;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");

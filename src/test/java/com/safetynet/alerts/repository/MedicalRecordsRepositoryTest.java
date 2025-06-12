@@ -9,10 +9,17 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the {@link MedicalRecordsRepository} class.
+ * This test class verifies basic CRUD operations on {@link MedicalRecords} objects.
+ */
 class MedicalRecordsRepositoryTest {
 
     private MedicalRecordsRepository repository;
 
+    /**
+     * Initializes the repository with sample medical records before each test.
+     */
     @BeforeEach
     void setUp() {
         repository = new MedicalRecordsRepository();
@@ -30,6 +37,9 @@ class MedicalRecordsRepositoryTest {
         ));
     }
 
+    /**
+     * Test that retrieves all medical records and checks their contents.
+     */
     @Test
     void getAllMedicalRecords() {
         List<MedicalRecords> result = repository.getAllMedicalRecords();
@@ -39,6 +49,9 @@ class MedicalRecordsRepositoryTest {
         assertEquals("Jane", result.get(1).getFirstName());
     }
 
+    /**
+     * Test adding a new medical record to the repository.
+     */
     @Test
     void addMedicalRecords() {
         repository.addMedicalRecords(new MedicalRecords(
@@ -54,6 +67,9 @@ class MedicalRecordsRepositoryTest {
         assertEquals(List.of("latex"), result.get(2).getAllergies());
     }
 
+    /**
+     * Test retrieving a specific medical record by first and last name.
+     */
     @Test
     void getMedicalRecords() {
         Optional<MedicalRecords> result = repository.getMedicalRecords("John", "Doe");
@@ -63,6 +79,9 @@ class MedicalRecordsRepositoryTest {
         assertEquals(List.of("med1:100mg", "med2:200mg"), result.get().getMedications());
     }
 
+    /**
+     * Test updating an existing medical record and verifying the new values.
+     */
     @Test
     void updateMedicalRecords() {
         repository.updateMedicalRecords(new MedicalRecords(
@@ -78,6 +97,9 @@ class MedicalRecordsRepositoryTest {
         assertEquals(List.of("gluten"), result.get().getAllergies());
     }
 
+    /**
+     * Test deleting a medical record and ensuring it is no longer present in the repository.
+     */
     @Test
     void deleteMedicalRecords() {
         repository.deleteMedicalRecords("Jane", "Smith");

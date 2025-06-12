@@ -18,6 +18,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Unit tests for {@link AlertController}.
+ * This class tests the different alert-related endpoints of the controller
+ * using a mocked {@link AlertService} and {@link MockMvc}.
+ */
 class AlertControllerTest {
 
     @Autowired
@@ -25,7 +30,10 @@ class AlertControllerTest {
 
     private AlertService alertService;
 
-
+    /**
+     * Sets up the test environment by initializing the mocked AlertService
+     * and setting up the AlertController with MockMvc.
+     */
     @BeforeEach
     void setup() {
         alertService = Mockito.mock(AlertService.class);
@@ -33,6 +41,9 @@ class AlertControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(alertController).build();
     }
 
+    /**
+     * Tests the /personInfoLastName endpoint with a known last name.
+     */
     @Test
     void testGetPersonInfo() throws Exception {
         String lastName = "Doe";
@@ -54,11 +65,14 @@ class AlertControllerTest {
         PersonInfoDTO dto = new PersonInfoDTO(person, medicalRecords);
         when(alertService.getPersonInfoLastName(lastName)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/personInfoLastName={lastName}", lastName))
+        mockMvc.perform(get("/personInfolastName={lastName}", lastName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].lastName").value("Doe"));
     }
 
+    /**
+     * Tests the /personInfoLastName endpoint with an unknown last name (should return 404).
+     */
     @Test
     void testGetPersonInfo_NotFound() throws Exception {
         when(alertService.getPersonInfoLastName("Unknown")).thenReturn(List.of());
@@ -67,6 +81,9 @@ class AlertControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    /**
+     * Tests the /childAlert endpoint with a known address.
+     */
     @Test
     void testGetChildAlert() throws Exception {
         String address = "1509 Culver St";
@@ -78,6 +95,9 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$[0].firstName").value("John"));
     }
 
+    /**
+     * Tests the /childAlert endpoint with an unknown address (should return 404).
+     */
     @Test
     void testGetChildAlert_NotFound() throws Exception {
         when(alertService.getChildByAddress("unknown")).thenReturn(List.of());
@@ -86,6 +106,9 @@ class AlertControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    /**
+     * Tests the /communityEmail endpoint with a known city.
+     */
     @Test
     void testGetCommunityEmail() throws Exception {
         CommunityEmailDTO email = new CommunityEmailDTO("email@example.com");
@@ -96,6 +119,9 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$[0].email").value("email@example.com"));
     }
 
+    /**
+     * Tests the /communityEmail endpoint with an unknown city (should return 404).
+     */
     @Test
     void testGetCommunityEmail_NotFound() throws Exception {
         when(alertService.getEmailByCity("unknown")).thenReturn(List.of());
@@ -104,6 +130,9 @@ class AlertControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    /**
+     * Tests the /phoneAlert endpoint with a known fire station number.
+     */
     @Test
     void testGetPhoneAlert() throws Exception {
         PhoneAlertDTO phone = new PhoneAlertDTO("123-456-7890");
@@ -114,6 +143,9 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$[0].phone").value("123-456-7890"));
     }
 
+    /**
+     * Tests the /phoneAlert endpoint with an unknown fire station number (should return 404).
+     */
     @Test
     void testGetPhoneAlert_NotFound() throws Exception {
         when(alertService.getPhoneNumberByFireStation("99")).thenReturn(List.of());
@@ -122,16 +154,19 @@ class AlertControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    /**
+     * Tests the /fire endpoint with a known address.
+     */
     @Test
     void testGetPersonByAddress() throws Exception {
         FireDTO fireDto = new FireDTO(
-                "John",                 // firstName
-                "Doe",                  // lastName
-                "123 rue",              // address
-                35,                     // age (Integer)
-                "123-456-7890",         // phone
-                List.of("med1", "med2"),// medications
-                List.of("allergy1")     // allergies
+                "John",
+                "Doe",
+                "123 rue",
+                35,
+                "123-456-7890",
+                List.of("med1", "med2"),
+                List.of("allergy1")
         );
         when(alertService.getPersonByAddress("123 rue")).thenReturn(List.of(fireDto));
 
@@ -140,6 +175,9 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$[0].lastName").value("Doe"));
     }
 
+    /**
+     * Tests the /fire endpoint with an unknown address (should return 404).
+     */
     @Test
     void testGetPersonByAddress_NotFound() throws Exception {
         when(alertService.getPersonByAddress("unknown")).thenReturn(List.of());
@@ -148,6 +186,9 @@ class AlertControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    /**
+     * Tests the /flood/stations endpoint with known station numbers.
+     */
     @Test
     void testGetFloodStations() throws Exception {
         FloodStationsDTO floodDto = new FloodStationsDTO(
@@ -165,6 +206,9 @@ class AlertControllerTest {
                 .andExpect(jsonPath("$[0].lastName").value("Doe"));
     }
 
+    /**
+     * Tests the /flood/stations endpoint with unknown station numbers (should return 404).
+     */
     @Test
     void testGetFloodStations_NotFound() throws Exception {
         when(alertService.getPersonByListOfStations(List.of("99"))).thenReturn(List.of());
