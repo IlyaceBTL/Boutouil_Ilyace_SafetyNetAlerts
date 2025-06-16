@@ -14,10 +14,12 @@ import java.util.Optional;
 public class MedicalRecordsService {
 
     private final MedicalRecordsRepository medicalRecordsRepository;
+    private final JSONWriterService jsonWriterService;
 
     @Autowired
-    public MedicalRecordsService(MedicalRecordsRepository medicalRecordsRepository) {
+    public MedicalRecordsService(MedicalRecordsRepository medicalRecordsRepository, JSONWriterService jsonWriterService) {
         this.medicalRecordsRepository = medicalRecordsRepository;
+        this.jsonWriterService = jsonWriterService;
     }
 
     /**
@@ -28,6 +30,7 @@ public class MedicalRecordsService {
      */
     public MedicalRecords createMedicalRecords(MedicalRecords medicalRecords) {
         medicalRecordsRepository.addMedicalRecords(medicalRecords);
+        jsonWriterService.saveMedicalRecord(medicalRecords);
         return medicalRecords;
     }
 
@@ -49,6 +52,7 @@ public class MedicalRecordsService {
      */
     public void updateMedicalRecords(MedicalRecords medicalRecords) {
         medicalRecordsRepository.updateMedicalRecords(medicalRecords);
+        jsonWriterService.updateMedicalRecords(medicalRecords);
     }
 
     /**
@@ -58,6 +62,7 @@ public class MedicalRecordsService {
      * @param lastName  The last name of the person.
      */
     public void deleteMedicalRecords(String firstName, String lastName) {
+        jsonWriterService.deleteMedicalRecord(firstName,lastName);
         medicalRecordsRepository.deleteMedicalRecords(firstName, lastName);
     }
 

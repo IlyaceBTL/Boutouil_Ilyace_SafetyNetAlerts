@@ -14,10 +14,12 @@ import java.util.Optional;
 public class PersonService {
 
     private final PersonRepository personRepository;
+    private final JSONWriterService jsonWriterService;
 
     @Autowired
-    public PersonService(PersonRepository personRepository) {
+    public PersonService(PersonRepository personRepository, JSONWriterService jsonWriterService) {
         this.personRepository = personRepository;
+        this.jsonWriterService = jsonWriterService;
     }
 
     /**
@@ -27,6 +29,7 @@ public class PersonService {
      * @return The created person.
      */
     public Person createPerson(Person person) {
+        jsonWriterService.savePerson(person);
         personRepository.addPerson(person);
         return person;
     }
@@ -48,6 +51,7 @@ public class PersonService {
      * @param person The person with updated data.
      */
     public void updatePerson(Person person) {
+        jsonWriterService.updatePerson(person);
         personRepository.updatePerson(person);
     }
 
@@ -58,6 +62,7 @@ public class PersonService {
      * @param lastName  The last name of the person.
      */
     public void deletePerson(String firstName, String lastName) {
+        jsonWriterService.deletePerson(firstName, lastName);
         personRepository.deletePerson(firstName, lastName);
     }
 

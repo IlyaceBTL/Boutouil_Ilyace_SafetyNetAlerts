@@ -10,6 +10,8 @@ import com.safetynet.alerts.repository.FireStationRepository;
 import com.safetynet.alerts.repository.MedicalRecordsRepository;
 import com.safetynet.alerts.repository.PersonRepository;
 import jakarta.annotation.PostConstruct;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service responsible for reading initial data from the JSON file and loading it
@@ -31,7 +31,7 @@ public class JSONReaderService {
     @Value("${data.path}")
     private String dataPath;
 
-    private static final Logger logger = Logger.getLogger(JSONReaderService.class.getName());
+    private static final Logger logger = LogManager.getLogger(JSONReaderService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final PersonRepository personRepository;
@@ -85,9 +85,9 @@ public class JSONReaderService {
             for (Person person : personList) {
                 personRepository.addPerson(person);
             }
-            logger.info(personList.size() + " Person(s) loaded from data.json");
+            logger.info("{} Person(s) loaded from data.json",personList.size());
         } catch (JsonProcessingException e) {
-            logger.log(Level.SEVERE, "Error loading person", e);
+            logger.error("Error loading person", e);
             throw new RuntimeException(e);
         }
     }
@@ -107,9 +107,9 @@ public class JSONReaderService {
             for (FireStation fireStation : fireStationList) {
                 fireStationRepository.addFireStation(fireStation);
             }
-            logger.info(fireStationList.size() + " FireStation(s) loaded from data.json");
+            logger.info("{} FireStation(s) loaded from data.json",fireStationList.size() );
         } catch (JsonProcessingException e) {
-            logger.log(Level.SEVERE, "Error loading FireStation", e);
+            logger.error("Error loading FireStation", e);
             throw new RuntimeException(e);
         }
     }
@@ -129,9 +129,9 @@ public class JSONReaderService {
             for (MedicalRecords medicalRecords : medicalRecordsList) {
                 medicalRecordsRepository.addMedicalRecords(medicalRecords);
             }
-            logger.info(medicalRecordsList.size() + " MedicalRecord(s) loaded from data.json");
+            logger.info("{} MedicalRecord(s) loaded from data.json",medicalRecordsList.size());
         } catch (JsonProcessingException e) {
-            logger.log(Level.SEVERE, "Error loading MedicalRecords", e);
+            logger.error("Error loading MedicalRecords", e);
             throw new RuntimeException(e);
         }
     }

@@ -23,14 +23,14 @@ public class FireStationService {
     private final PersonRepository personRepository;
     private final FireStationRepository fireStationRepository;
     private final MedicalRecordsService medicalRecordsService;
+    private final JSONWriterService jsonWriterService;
 
     @Autowired
-    public FireStationService(PersonRepository personRepository,
-                              FireStationRepository fireStationRepository,
-                              MedicalRecordsService medicalRecordsService) {
+    public FireStationService(PersonRepository personRepository, FireStationRepository fireStationRepository, MedicalRecordsService medicalRecordsService, JSONWriterService jsonWriterService) {
         this.personRepository = personRepository;
         this.fireStationRepository = fireStationRepository;
         this.medicalRecordsService = medicalRecordsService;
+        this.jsonWriterService = jsonWriterService;
     }
 
     /**
@@ -40,6 +40,7 @@ public class FireStationService {
      * @return the created fire station
      */
     public FireStation createFireStation(FireStation fireStation) {
+        jsonWriterService.saveFireStation(fireStation);
         fireStationRepository.addFireStation(fireStation);
         return fireStation;
     }
@@ -50,6 +51,7 @@ public class FireStationService {
      * @param fireStation the fire station with updated data
      */
     public void updateFireStation(FireStation fireStation) {
+        jsonWriterService.updateFireStation(fireStation);
         fireStationRepository.updateFireStation(fireStation);
     }
 
@@ -59,6 +61,7 @@ public class FireStationService {
      * @param address the address for which the fire station should be removed
      */
     public void deleteFireStation(String address) {
+        jsonWriterService.deleteFireStation(address);
         fireStationRepository.deleteFireStation(address);
     }
 
@@ -75,29 +78,17 @@ public class FireStationService {
         List<FireStation> fireStationList = fireStationRepository.getAllFireStation();
 
         // Get all addresses covered by the given station
-        Set<String> addressesForStation = fireStationList.stream()
-                .filter(fs -> fs.getStation().equals(stationNumber))
-                .map(FireStation::getAddress)
-                .collect(Collectors.toSet());
+        Set<String> addressesForStation = fireStationList.stream().filter(fs -> fs.getStation().equals(stationNumber)).map(FireStation::getAddress).collect(Collectors.toSet());
 
         // Get persons living at these addresses and attach medical info
-        List<FireStationDTO> fireStationDTOList = personList.stream()
-                .filter(person -> addressesForStation.contains(person.getAddress()))
-                .map(person -> {
-                    MedicalRecords medicalRecords = medicalRecordsService
-                            .getMedicalRecordsByName(person.getFirstName(), person.getLastName())
-                            .orElse(medicalRecordsService.blankMedicalRecords());
-                    return new FireStationDTO(person, medicalRecords);
-                })
-                .toList();
+        List<FireStationDTO> fireStationDTOList = personList.stream().filter(person -> addressesForStation.contains(person.getAddress())).map(person -> {
+            MedicalRecords medicalRecords = medicalRecordsService.getMedicalRecordsByName(person.getFirstName(), person.getLastName()).orElse(medicalRecordsService.blankMedicalRecords());
+            return new FireStationDTO(person, medicalRecords);
+        }).toList();
 
         // Count adults and children
-        long numberOfAdults = fireStationDTOList.stream()
-                .filter(dto -> dto.getAge() > 18)
-                .count();
-        long numberOfChildren = fireStationDTOList.stream()
-                .filter(dto -> dto.getAge() <= 18 && dto.getAge() >= 0)
-                .count();
+        long numberOfAdults = fireStationDTOList.stream().filter(dto -> dto.getAge() > 18).count();
+        long numberOfChildren = fireStationDTOList.stream().filter(dto -> dto.getAge() <= 18 && dto.getAge() >= 0).count();
 
         return new FireStationResponseDTO(fireStationDTOList, (int) numberOfAdults, (int) numberOfChildren);
     }

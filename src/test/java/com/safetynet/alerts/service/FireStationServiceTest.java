@@ -34,7 +34,8 @@ class FireStationServiceTest {
         personRepository = mock(PersonRepository.class);
         fireStationRepository = mock(FireStationRepository.class);
         medicalRecordsService = mock(MedicalRecordsService.class);
-        fireStationService = new FireStationService(personRepository, fireStationRepository, medicalRecordsService);
+        JSONWriterService jsonWriterService = mock(JSONWriterService.class);
+        fireStationService = new FireStationService(personRepository, fireStationRepository, medicalRecordsService,jsonWriterService);
     }
 
     /**
